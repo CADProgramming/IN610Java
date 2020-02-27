@@ -1,63 +1,54 @@
 package ptempconv;
 
-import java.lang.Math;
+import java.text.DecimalFormat;
 
 public class TempConv {
 	private double cel;
 	private double fah;
 	private double kel;
+	private DecimalFormat formatter;
 	
 	public TempConv(double cel) {
-		updateTempFromCel(cel);
+		formatter = new DecimalFormat("0.##");
+		setCel(cel);
 	}
 	
 	@Override
 	public String toString() {
-		return "Celcius: " + getCel() + "\n" + 
-				"Fahrenheit: " + getFah() + "\n" +
-				"Kelvin: " + getKel() + "\n";
-	}
-
-	public void updateTempFromCel(double cel) {
-		setCel(cel);
-		setFah((cel * (9.0/5.0)) + 32);
-		setKel(cel + 273.15);
-	}
-	
-	public void updateTempFromFah(double fah) {
-		setFah(fah);
-		setCel((fah - 32) * (5.0/9.0));
-		setKel(cel + 273.15);
-	}
-	
-	public void updateTempFromKel(double kel) {
-		setKel(kel);
-		setCel(kel - 273.15);
-		setFah((cel * (9.0/5.0)) + 32);
+		return "Celsius: " + getCel() + " | Fahrenheit: " + getFah() + " | Kelvin: " + getKel();
 	}
 	
 	public double getCel() {
-		return Math.round(cel * 100) / 100.0;
+		String celString = formatter.format(cel);
+		return Double.parseDouble(celString);
 	}
 
 	public void setCel(double cel) {
 		this.cel = cel;
+		fah = ((cel * (9.0/5.0)) + 32);
+		kel = (cel + 273.15);
 	}
 
 	public double getFah() {
-		return Math.round(fah * 100) / 100.0;
+		String fahString = formatter.format(fah);
+		return Double.parseDouble(fahString);
 	}
 
 	public void setFah(double fah) {
 		this.fah = fah;
+		cel = ((fah - 32) * (5.0/9.0));
+		kel = (cel + 273.15);
 	}
 
 	public double getKel() {
-		return Math.round(kel * 100) / 100.0;
+		String kelString = formatter.format(kel);
+		return Double.parseDouble(kelString);
 	}
 
 	public void setKel(double kel) {
 		this.kel = kel;
+		cel = (kel - 273.15);
+		fah = ((cel * (9.0/5.0)) + 32);
 	}
 
 }
