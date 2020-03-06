@@ -44,7 +44,7 @@ public class Friend {
 	}
 	
 	public int calcAge() {
-		if (!birthDate.equals(null)) {
+		if (birthDate != null) {
 			Period age = Period.between(birthDate, LocalDate.now());
 			return age.getYears();
 		}
@@ -66,15 +66,15 @@ public class Friend {
 	
 	@Override
 	public String toString() {
-		StringBuilder returnString = new StringBuilder();
+		StringBuilder returnString = new StringBuilder("");
 		
-		if (!firstName.equals(null)) returnString.append("First Name: " + getFirstName() + "\n");
-		if (!lastName.equals(null)) returnString.append("Last Name: " + getLastName() + "\n");
-		if (!birthDate.equals(null)) returnString.append("Birth Date: " + getBirthDate().toString() + "\n");
-		if (!gender.equals(null)) returnString.append("Gender: " + getGender() + "\n");
-		if (!homeTown.equals(null)) returnString.append("Home Town: " + getHomeTown() + "\n");
-		if (!email.equals(null)) returnString.append("Email: " + getEmail() + "\n");
-		if (!relationshipStatus.equals(null)) returnString.append("Relationship Status: " + getRelationshipStatus() + "\n");
+		if (firstName != null) returnString.append("First Name: " + getFirstName() + "\n");
+		if (lastName != null) returnString.append("Last Name: " + getLastName() + "\n");
+		if (birthDate != null) returnString.append("Birth Date: " + getBirthDate().toString() + "\n");
+		if (gender != null) returnString.append("Gender: " + getGender() + "\n");
+		if (homeTown != null) returnString.append("Home Town: " + getHomeTown() + "\n");
+		if (email != null) returnString.append("Email: " + getEmail() + "\n");
+		if (relationshipStatus != null) returnString.append("Relationship Status: " + getRelationshipStatus() + "\n");
 			
 		return returnString.toString();
 	}

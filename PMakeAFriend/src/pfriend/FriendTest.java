@@ -19,7 +19,17 @@ class FriendTest {
 
 	@Test
 	void testCalcAge() {
-		assertEquals(35, patrick.calcAge());
+		assertEquals(34, patrick.calcAge());
+	}
+	
+	@Test
+	void testCalcAge2() {
+		assertEquals(-1, spongeBob.calcAge());
+	}
+	
+	@Test
+	void testName() {
+		assertEquals(true, spongeBob.isTheSameFriend(spongeBob));
 	}
 
 	@Test
@@ -72,5 +82,10 @@ class FriendTest {
 		squidward.setRelationshipStatus(Relationship.DIVORCED);
 		assertEquals(Relationship.DIVORCED, squidward.getRelationshipStatus());
 	}
-
+	
+	@Test
+	void getDateEntered() {
+		LocalDate todaysDate = LocalDate.of(2020, 03, 6);
+		assertEquals(todaysDate, spongeBob.getDateEntered());
+	}
 }
