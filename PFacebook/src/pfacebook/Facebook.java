@@ -70,6 +70,7 @@ public class Facebook {
 		for (Friend friendInList : friendList) {
 			if (friendInList.getBirthDate() != null && friendInList.calcAge() < 21) {
 				returnString.append(friendInList.getFirstName());
+				returnString.append('\n');
 			}
 		}
 		
@@ -84,6 +85,7 @@ public class Facebook {
 		
 		for (Friend friendInList : sortedList) {
 			returnString.append(friendInList.getFirstName());
+			returnString.append('\n');
 		}
 		
 		System.out.println(returnString.toString());

@@ -13,7 +13,7 @@ class FacebookTest {
 	Facebook claytonProfile = new Facebook();
 
 	Friend spongeBob = new Friend("Spongebob", "Squarepants");
-	Friend patrick = new Friend("Patrick", "Star", 1985, 4, 23);
+	Friend patrick = new Friend("Patrick", "Star", 2003, 4, 23);
  	Friend squidward = new Friend("Squidward", "Tentacles", 1972, 10, 9, Gender.MALE, "Bikini Bottom", "squiddy08@tentacles.com", Relationship.SINGLE);
 	
 	@Test
@@ -70,7 +70,6 @@ class FacebookTest {
 		claytonProfile.addFriend(squidward);
 		
 		claytonProfile.toString();
-		fail("Not yet implemented");
 	}
 
 	@Test
@@ -80,7 +79,6 @@ class FacebookTest {
 		claytonProfile.addFriend(squidward);
 		
 		claytonProfile.displayUnder21();
-		fail("Not yet implemented");
 	}
 
 	@Test
@@ -90,7 +88,6 @@ class FacebookTest {
 		claytonProfile.addFriend(squidward);
 		
 		claytonProfile.toAlphaSortString();
-		fail("Not yet implemented");
 	}
 
 }
