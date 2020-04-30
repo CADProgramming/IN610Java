@@ -105,4 +105,82 @@ public class Utilities {
 			return indexes;
 		}
 	}
+	
+	public static void bubbleSort(int[] myArray) {
+        int temp;
+        for (int i = 0; i < myArray.length - 1; i++)
+        {
+            for (int j = 0; j < myArray.length - 1; j++)
+            {
+                if (myArray[j] > myArray[j + 1])
+                {
+                    temp = myArray[j + 1];
+                    myArray[j + 1] = myArray[j];
+                    myArray[j] = temp;
+                }
+            }
+        }
+
+    }
+	
+	public static void bubbleSort(String[] myArray) {
+        String temp;
+        for (int i = 0; i < myArray.length - 1; i++)
+        {
+            for (int j = 0; j < myArray.length - 1; j++)
+            {
+                if (myArray[j].compareTo(myArray[j + 1]) > 0)
+                {
+                    temp = myArray[j + 1];
+                    myArray[j + 1] = myArray[j];
+                    myArray[j] = temp;
+                }
+            }
+        }
+
+    }
+	
+	public static int binarySearch(int[] numbers, int target) {
+		int leftIndex = 0;
+		int rightIndex = numbers.length - 1;
+		int middleIndex = 0;
+		
+		while (leftIndex <= rightIndex) {
+			middleIndex = (rightIndex + leftIndex) / 2;
+			if (numbers[middleIndex] == target) {
+				return middleIndex;
+			}
+			else if (target < numbers[middleIndex]) {
+				rightIndex = middleIndex - 1;
+			}
+			else if (target > numbers[middleIndex]) {
+				leftIndex = middleIndex + 1;
+			}
+			
+		}
+		
+		return -1;
+	}
+	
+	public static int binarySearch(String[] words, String target) {
+		int leftIndex = 0;
+		int rightIndex = words.length - 1;
+		int middleIndex = 0;
+		
+		while (leftIndex <= rightIndex) {
+			middleIndex = (rightIndex + leftIndex) / 2;
+			if (words[middleIndex].equals(target)) {
+				return middleIndex;
+			}
+			else if (target.compareTo(words[middleIndex]) < 0) {
+				rightIndex = middleIndex - 1;
+			}
+			else if (target.compareTo(words[middleIndex]) > 0) {
+				leftIndex = middleIndex + 1;
+			}
+			
+		}
+		
+		return -1;
+	}
 }

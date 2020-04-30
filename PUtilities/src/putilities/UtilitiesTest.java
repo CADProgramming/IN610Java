@@ -123,4 +123,22 @@ class UtilitiesTest {
 					Utilities.findIt(numbers, 0);
 				});
 	}
+	
+	@Test
+	void testBinarySearchInt() {
+		int[] numbers = { 3, 65, 1, 2, 25, 11, 13 };
+		Utilities.bubbleSort(numbers);
+		assertEquals(5, Utilities.binarySearch(numbers, 25));
+		assertEquals(2, Utilities.binarySearch(numbers, 3));
+		assertEquals(-1, Utilities.binarySearch(numbers, 132));
+	}
+	
+	@Test
+	void testBinarySearchString() {
+		String[] words = { "dog", "cat", "bird", "pie", "pizza", "corona virus", "help" };
+		Utilities.bubbleSort(words);
+		assertEquals(0, Utilities.binarySearch(words, "bird"));
+		assertEquals(5, Utilities.binarySearch(words, "pie"));
+		assertEquals(-1, Utilities.binarySearch(words, "blake"));
+	}
 }
