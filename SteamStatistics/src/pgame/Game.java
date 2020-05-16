@@ -2,7 +2,7 @@ package pgame;
 
 import java.util.ArrayList;
 
-public class Game {
+public class Game implements Comparable<Game> {
 	
 	private Long id;
 	private String name;
@@ -15,7 +15,7 @@ public class Game {
 	private Long totalPlayTime;
 	private ArrayList<Achievement> playerAchievements;
 	
-	public Game(Long id, String name, Long totalPlayTime) {
+	public Game(Long id, String name, Long totalPlayTime){
 		setId(id);
 		setName(name);
 		setTotalPlayTime(totalPlayTime);
@@ -115,5 +115,10 @@ public class Game {
 				"\nAge Restriction: " + getRequiredAge() + 
 				"\nCurrent Player Count: " + getPlayerBase() +
 				"\nTotal Play Time: " + getTotalPlayTime();
+	}
+
+	@Override
+	public int compareTo(Game gameToCompare) {
+		return name.compareTo(gameToCompare.getName());
 	}
 }
