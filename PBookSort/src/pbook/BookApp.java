@@ -9,7 +9,7 @@ import java.util.TreeSet;
 public class BookApp {
 
 	public static void main(String[] args) {
-		TreeSet<Book> books = new TreeSet<Book>();
+		ArrayList<Book> books = new ArrayList<Book>();
 
 		books.add(new Book("Rachel's Legacy", "Thomas Julie"));
 		books.add(new Book("Bulibasha", "Ihimaera Witi"));
@@ -25,7 +25,7 @@ public class BookApp {
 		AuthorCompare ac = new AuthorCompare();
 		
 		//Collection.sort(books);
-		//Collections.sort(books, ac);
+		Collections.sort(books, ac);
 		
 		for(Book book : books) {
 			System.out.println(book.toString());

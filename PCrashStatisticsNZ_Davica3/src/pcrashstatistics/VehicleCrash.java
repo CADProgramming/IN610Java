@@ -1,6 +1,9 @@
 package pcrashstatistics;
 
+import java.util.Arrays;
+
 public class VehicleCrash {
+	private int rowID;
 	private int year;
 	private String severity;
 	private int[] injuries;
@@ -22,11 +25,12 @@ public class VehicleCrash {
 	private String lightConditions;
 	private String weatherA;
 	private String weatherB;
-	private int[] crashObjectStruckCount;
+	private int[] crashObjectsHit;
 	
-	public VehicleCrash(int year, String severity, int[] injuries, String vehiclesInvolved, String location, boolean isIntersection, String junctionType, boolean isFromSideRoad, int crashDistance, 
+	public VehicleCrash(int rowID, int year, String severity, int[] injuries, String vehiclesInvolved, String location, boolean isIntersection, String junctionType, boolean isFromSideRoad, int crashDistance, 
 			boolean onStateHighway, String terrainLevel, String roadCharacter, String roadCurvature, String roadMarking, String roadSurface, boolean roadIsWet, String trafficControl, int[] speedLimits, 
-			String lightConditions, String weatherA, String weatherB, int[] crashObjectStruckCount) {
+			String lightConditions, String weatherA, String weatherB, int[] crashObjectsHit) {
+		setRowID(rowID);
 		setYear(year);
 		setSeverity(severity);
 		setInjuries(injuries);
@@ -35,6 +39,7 @@ public class VehicleCrash {
 		setIntersection(isIntersection);
 		setJunctionType(junctionType);
 		setFromSideRoad(isFromSideRoad);
+		setCrashDistance(crashDistance);
 		setOnStateHighway(onStateHighway);
 		setTerrainLevel(terrainLevel);
 		setRoadCharacter(roadCharacter);
@@ -47,9 +52,30 @@ public class VehicleCrash {
 		setLightConditions(lightConditions);
 		setWeatherA(weatherA);
 		setWeatherB(weatherB);
-		setCrashObjectStruckCount(crashObjectStruckCount);
+		setCrashObjectsHit(crashObjectsHit);
 	}
 
+	@Override
+	public String toString() {
+		return "VehicleCrash [year=" + year + ",\n severity=" + severity + ",\n injuries=" + Arrays.toString(injuries)
+				+ ",\n vehiclesInvolved=" + vehiclesInvolved + ",\n location=" + location + ",\n isIntersection="
+				+ isIntersection + ",\n junctionType=" + junctionType + ",\n isFromSideRoad=" + isFromSideRoad
+				+ ",\n crashDistance=" + crashDistance + ",\n onStateHighway=" + onStateHighway + ",\n terrainLevel="
+				+ terrainLevel + ",\n roadCharacter=" + roadCharacter + ",\n roadCurvature=" + roadCurvature
+				+ ",\n roadMarking=" + roadMarking + ",\n roadSurface=" + roadSurface + ",\n roadIsWet=" + roadIsWet
+				+ ",\n trafficControl=" + trafficControl + ",\n speedLimits=" + Arrays.toString(speedLimits)
+				+ ",\n lightConditions=" + lightConditions + ",\n weatherA=" + weatherA + ",\n weatherB=" + weatherB
+				+ ",\n crashObjectStruckCount=" + Arrays.toString(crashObjectsHit) + "]\n";
+	}
+
+	public int getRowID() {
+		return rowID;
+	}
+
+	public void setRowID(int rowID) {
+		this.rowID = rowID;
+	}
+	
 	public int getYear() {
 		return year;
 	}
@@ -218,12 +244,12 @@ public class VehicleCrash {
 		this.weatherB = weatherB;
 	}
 
-	public int[] getCrashObjectStruckCount() {
-		return crashObjectStruckCount;
+	public int[] getCrashObjectsHit() {
+		return crashObjectsHit;
 	}
 
-	public void setCrashObjectStruckCount(int[] crashObjectStruckCount) {
-		this.crashObjectStruckCount = crashObjectStruckCount;
+	public void setCrashObjectsHit(int[] crashObjectsHit) {
+		this.crashObjectsHit = crashObjectsHit;
 	}
 
 }
