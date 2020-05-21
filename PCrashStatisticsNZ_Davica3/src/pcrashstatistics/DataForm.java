@@ -699,8 +699,8 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 		
 		String textAreaString = "";
 		
-		textAreaString += "Maximum: " + DataStatistics.getMax(crashes, statsCategory.getSelectedItem()) + "\n";
-		textAreaString += "Minimum: " + DataStatistics.getMin(crashes, statsCategory.getSelectedItem()) + "\n";
+		textAreaString += "Maximum: " + DataStatistics.getMax(crashes, statsCategory.getSelectedItem()) + "\n(See Top 10 Table)\n";
+		textAreaString += "Minimum: " + DataStatistics.getMin(crashes, statsCategory.getSelectedItem()) + "\n(See Bottom 10 Table)\n";
 		textAreaString += "Total: " + DataStatistics.getTotal(crashes, statsCategory.getSelectedItem()) + "\n";
 		double mean = DataStatistics.getMean(crashes, statsCategory.getSelectedItem());
 		textAreaString += "Mean: " + DataStatistics.round(mean, 2) + "\n";

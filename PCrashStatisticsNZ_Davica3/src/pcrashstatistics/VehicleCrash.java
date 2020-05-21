@@ -2,7 +2,7 @@ package pcrashstatistics;
 
 import java.util.Arrays;
 
-public class VehicleCrash {
+public class VehicleCrash implements Comparable<VehicleCrash> {
 	private int rowID;
 	private int year;
 	private String severity;
@@ -57,15 +57,15 @@ public class VehicleCrash {
 
 	@Override
 	public String toString() {
-		return "VehicleCrash [year=" + year + ",\n severity=" + severity + ",\n injuries=" + Arrays.toString(injuries)
-				+ ",\n vehiclesInvolved=" + vehiclesInvolved + ",\n location=" + location + ",\n isIntersection="
-				+ isIntersection + ",\n junctionType=" + junctionType + ",\n isFromSideRoad=" + isFromSideRoad
-				+ ",\n crashDistance=" + crashDistance + ",\n onStateHighway=" + onStateHighway + ",\n terrainLevel="
-				+ terrainLevel + ",\n roadCharacter=" + roadCharacter + ",\n roadCurvature=" + roadCurvature
-				+ ",\n roadMarking=" + roadMarking + ",\n roadSurface=" + roadSurface + ",\n roadIsWet=" + roadIsWet
-				+ ",\n trafficControl=" + trafficControl + ",\n speedLimits=" + Arrays.toString(speedLimits)
-				+ ",\n lightConditions=" + lightConditions + ",\n weatherA=" + weatherA + ",\n weatherB=" + weatherB
-				+ ",\n crashObjectStruckCount=" + Arrays.toString(crashObjectsHit) + "]\n";
+		return " Row ID: " + rowID + "\n VehicleCrash Year: " + year + "\n Severity: " + severity + "\n Injuries: " + Arrays.toString(injuries)
+				+ "\n Vehicles Involved: " + vehiclesInvolved + "\n Location: " + location + "\n Is Intersection: "
+				+ isIntersection + "\n Junction Type: " + junctionType + "\n Is From Side Road: " + isFromSideRoad
+				+ "\n Crash Distance: " + crashDistance + "\n On State Highway: " + onStateHighway + "\n Terrain Level: "
+				+ terrainLevel + "\n Road Character: " + roadCharacter + "\n Road Curvature: " + roadCurvature
+				+ "\n Road Marking: " + roadMarking + "\n Road Surface: " + roadSurface + "\n Road Is Wet: " + roadIsWet
+				+ "\n Traffic Control: " + trafficControl + "\n Speed Limits: " + Arrays.toString(speedLimits)
+				+ "\n Light Conditions: " + lightConditions + "\n Weather A: " + weatherA + "\n Weather B: " + weatherB
+				+ "\n Crash Object Struck Count: " + Arrays.toString(crashObjectsHit) + "\n";
 	}
 
 	public int getRowID() {
@@ -250,6 +250,11 @@ public class VehicleCrash {
 
 	public void setCrashObjectsHit(int[] crashObjectsHit) {
 		this.crashObjectsHit = crashObjectsHit;
+	}
+
+	@Override
+	public int compareTo(VehicleCrash o) {
+		return ((Integer)rowID).compareTo(o.getRowID());
 	}
 
 }

@@ -3,6 +3,7 @@ package pcrashstatistics;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.TreeSet;
 
 public class DataStatistics {
 
@@ -36,7 +37,7 @@ public static int getMax(ArrayList<VehicleCrash> crashData, String dataName) {
 		return min;
 	}
 	
-	public static ArrayList<VehicleCrash> getTopTen(ArrayList<VehicleCrash> crashData, String dataName) {
+public static ArrayList<VehicleCrash> getTopTen(ArrayList<VehicleCrash> crashData, String dataName) {
 		
 		ArrayList<VehicleCrash> topTen = new ArrayList<VehicleCrash>();
 		ArrayList<VehicleCrash> sortedData = new ArrayList<VehicleCrash>(crashData);
@@ -76,6 +77,16 @@ public static int getMax(ArrayList<VehicleCrash> crashData, String dataName) {
 		}
 		
 		return bottomTen;
+	}
+	
+	public static TreeSet<VehicleCrash> getTopTenString(ArrayList<VehicleCrash> crashData, String dataName) {
+		
+		return null;
+	}
+	
+	public static TreeSet<VehicleCrash> getBottomTenString(ArrayList<VehicleCrash> crashData, String dataName) {
+		
+		return null;
 	}
 	
 	public static long getTotal(ArrayList<VehicleCrash> crashData, String dataName) {
