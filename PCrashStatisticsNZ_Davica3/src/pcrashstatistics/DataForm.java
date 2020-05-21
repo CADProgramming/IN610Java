@@ -47,8 +47,11 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 	private JPanel statsPanel;
 	private JPanel graphPanel;
 	private JScrollPane scrollPane;
-	private JTable sortTable;
-	private DefaultTableModel tableModel;
+	private JTable sortingTable;
+	private DefaultTableModel sortingTableModel;
+	private DefaultTableModel searchTableModel;
+	private DefaultTableModel topTenTableModel;
+	private DefaultTableModel bottomTenTableModel;
 	private JPanel sortSelection;
 	private JPanel labelPanel;
 	private JLabel lblNewLabel;
@@ -63,6 +66,7 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 	private JLabel sortLabel;
 	
 	private JScrollPane scrollPane_1;
+	private ArrayList<VehicleCrash> searchData;
 	private JTable searchTable;
 	private JPanel searchFields;
 	private JScrollPane filterScrollPane;
@@ -73,12 +77,36 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 	private JLabel lblNewLabel_2;
 	private JLabel searchResultLabel;
 	private JLabel gapLabel;
+	private JPanel controlPanel1;
+	private JPanel graph1Panel;
+	private JPanel graph2Panel;
+	private JPanel dataPanel;
+	private JPanel top10Panel;
+	private JPanel bottom10Panel;
+	private JPanel displayPanel;
+	private JPanel controlPanel2;
+	private Choice statsCategory;
+	private Checkbox statsCheckBox;
+	private Choice choice_1;
+	private JSpinner spinner;
+	private JLabel lblNewLabel_3;
+	private JTextPane statsTextPane1;
+	private JTextPane statsTextPane2;
+	private ArrayList<VehicleCrash> topTen;
+	private ArrayList<VehicleCrash> bottomTen;
+	private JScrollPane scrollPane_2;
+	private JScrollPane scrollPane_3;
+	private JTable topTenTable;
+	private JTable bottomTenTable;
 	
 
 	public DataForm(ArrayList<VehicleCrash> crashData) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		setVisible(true);
 		setResizable(false);
 		this.crashData = crashData;
+		searchData = new ArrayList<VehicleCrash>();
+		topTen = new ArrayList<VehicleCrash>();
+		bottomTen = new ArrayList<VehicleCrash>();
 		
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		Rectangle formSize = new Rectangle(0, 0, 1400, 900);
@@ -109,6 +137,14 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 		tabbedPane.addTab("Search Data", null, searchPanel, null);
 		searchPanel.setLayout(null);
 		
+		statsPanel = new JPanel();
+		tabbedPane.addTab("Data Statistics", null, statsPanel, null);
+		statsPanel.setLayout(null);
+		
+		graphPanel = new JPanel();
+		tabbedPane.addTab("Data Graphs", null, graphPanel, null);
+		graphPanel.setLayout(null);
+		
 		scrollPane_1 = new JScrollPane();
 		scrollPane_1.setPreferredSize(new Dimension(800, 728));
 		scrollPane_1.setMinimumSize(new Dimension(800, 760));
@@ -116,17 +152,16 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 		scrollPane_1.setBounds(469, 11, 900, 802);
 		searchPanel.add(scrollPane_1);
 		
-		tableModel = new DefaultTableModel(
-				new Object[][] {
-				},
-				columnHeaders
-			);
+		sortingTableModel = new DefaultTableModel(new Object[][] {}, columnHeaders);
+		searchTableModel = new DefaultTableModel(new Object[][] {}, columnHeaders);
+		topTenTableModel = new DefaultTableModel(new Object[][] {}, columnHeaders);
+		bottomTenTableModel = new DefaultTableModel(new Object[][] {}, columnHeaders);
 		
 		searchTable = new JTable();
 		searchTable.setRowSelectionAllowed(false);
 		searchTable.setEnabled(false);
 		searchTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		searchTable.setModel(tableModel);	
+		searchTable.setModel(searchTableModel);	
 		scrollPane_1.setViewportView(searchTable);
 		
 		searchFields = new JPanel();
@@ -163,6 +198,7 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 		addButton.addActionListener(this);
 		
 		applyButton = new JButton("Apply Filters");
+		applyButton.setEnabled(false);
 		buttonControlPanel.add(applyButton);
 		applyButton.addActionListener(this);
 
@@ -175,13 +211,106 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 		filterContainerPanel.add(gapLabel);
 		filterContainerPanel.add(searchResultLabel);
 		
-		statsPanel = new JPanel();
-		tabbedPane.addTab("Data Statistics", null, statsPanel, null);
-		statsPanel.setLayout(null);
+		controlPanel1 = new JPanel();
+		controlPanel1.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		controlPanel1.setBounds(10, 11, 344, 46);
+		statsPanel.add(controlPanel1);
 		
-		graphPanel = new JPanel();
-		tabbedPane.addTab("Graph Data", null, graphPanel, null);
-		graphPanel.setLayout(null);
+		statsCategory = new Choice();
+		statsCategory.addItemListener(this);
+		List<String> stringTermList = Arrays.asList(stringSearchTerms);
+		List<String> boolTermList = Arrays.asList(boolSearchTerms);
+		for (String category : columnHeaders) {
+			if (!stringTermList.contains(category) &&
+					!boolTermList.contains(category)) {
+				statsCategory.add(category);
+			}
+		}
+		controlPanel1.add(statsCategory);
+		
+		statsCheckBox = new Checkbox("Use Search Data");
+		statsCheckBox.addItemListener(this);
+		controlPanel1.add(statsCheckBox);
+		
+		graph1Panel = new JPanel();
+		graph1Panel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		graph1Panel.setBounds(364, 11, 497, 339);
+		statsPanel.add(graph1Panel);
+		
+		graph2Panel = new JPanel();
+		graph2Panel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		graph2Panel.setBounds(871, 11, 497, 339);
+		statsPanel.add(graph2Panel);
+		
+		dataPanel = new JPanel();
+		dataPanel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		dataPanel.setBounds(10, 68, 344, 282);
+		statsPanel.add(dataPanel);
+		
+		statsTextPane1 = new JTextPane();
+		statsTextPane1.setFont(new Font("Tahoma", Font.PLAIN, 17));
+		statsTextPane1.setPreferredSize(new Dimension(320, 265));
+		statsTextPane1.setMinimumSize(new Dimension(6, 7));
+		dataPanel.add(statsTextPane1);
+		
+		top10Panel = new JPanel();
+		top10Panel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)), "Top 10 Results", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		top10Panel.setBounds(363, 361, 1006, 228);
+		statsPanel.add(top10Panel);
+		
+		scrollPane_2 = new JScrollPane();
+		scrollPane_2.setPreferredSize(new Dimension(994, 200));
+		scrollPane_2.setMinimumSize(new Dimension(800, 760));
+		scrollPane_2.setLocation(new Point(100, 100));
+		top10Panel.add(scrollPane_2);
+		
+		topTenTable = new JTable();
+		topTenTable.setRowSelectionAllowed(false);
+		topTenTable.setEnabled(false);
+		topTenTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		topTenTable.setModel(topTenTableModel);
+		scrollPane_2.setViewportView(topTenTable);
+		
+		bottom10Panel = new JPanel();
+		bottom10Panel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)), "Bottom 10 Results", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		bottom10Panel.setBounds(362, 600, 1006, 222);
+		statsPanel.add(bottom10Panel);
+		
+		scrollPane_3 = new JScrollPane();
+		scrollPane_3.setPreferredSize(new Dimension(994, 200));
+		scrollPane_3.setMinimumSize(new Dimension(800, 760));
+		scrollPane_3.setLocation(new Point(100, 100));
+		bottom10Panel.add(scrollPane_3);
+		
+		bottomTenTable = new JTable();
+		bottomTenTable.setRowSelectionAllowed(false);
+		bottomTenTable.setEnabled(false);
+		bottomTenTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		bottomTenTable.setModel(bottomTenTableModel);
+		scrollPane_3.setViewportView(bottomTenTable);
+		
+		displayPanel = new JPanel();
+		displayPanel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		displayPanel.setBounds(10, 418, 344, 404);
+		statsPanel.add(displayPanel);
+		
+		statsTextPane2 = new JTextPane();
+		statsTextPane2.setPreferredSize(new Dimension(320, 387));
+		displayPanel.add(statsTextPane2);
+		
+		controlPanel2 = new JPanel();
+		controlPanel2.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		controlPanel2.setBounds(10, 361, 344, 46);
+		statsPanel.add(controlPanel2);
+		
+		lblNewLabel_3 = new JLabel("New label");
+		controlPanel2.add(lblNewLabel_3);
+		
+		spinner = new JSpinner();
+		controlPanel2.add(spinner);
+		
+		choice_1 = new Choice();
+		controlPanel2.add(choice_1);
 		
 		scrollPane = new JScrollPane();
 		scrollPane.setLocation(new Point(100, 100));
@@ -190,12 +319,12 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 		scrollPane.setMinimumSize(new Dimension(800, 760));
 		sortPanel.add(scrollPane);
 		
-		sortTable = new JTable();
-		sortTable.setRowSelectionAllowed(false);
-		sortTable.setEnabled(false);
-		sortTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		sortTable.setModel(tableModel);
-		scrollPane.setViewportView(sortTable);
+		sortingTable = new JTable();
+		sortingTable.setRowSelectionAllowed(false);
+		sortingTable.setEnabled(false);
+		sortingTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		sortingTable.setModel(sortingTableModel);
+		scrollPane.setViewportView(sortingTable);
 		
 		sortSelection = new JPanel();
 		sortSelection.setBounds(new Rectangle(920, 11, 449, 811));
@@ -276,8 +405,9 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 		
 		repaint();
 		
-		drawTableData();
-		drawSearchTableData(crashData);
+		updateStatsBox();
+		drawTableData(crashData, sortingTable, sortingTableModel);
+		drawTableData(crashData, searchTable, searchTableModel);
 	}
 	
 	private void calculateColumnSizes(JTable table) {
@@ -308,15 +438,16 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 		}
 	}
 	
-	public void drawTableData() {
-		calculateColumnSizes(sortTable);
+	public void drawTableData(ArrayList<VehicleCrash> data, JTable table, DefaultTableModel tableModel) {
+		applyButton.setEnabled(false);
+		calculateColumnSizes(table);
 		
 		tableModel.setRowCount(0);
-		for (int r = 0; r < crashData.size(); r++) {
+		for (int r = 0; r < data.size(); r++) {
 			
 			Object[] object = new Object[64];
 			
-			VehicleCrash crash = crashData.get(r);
+			VehicleCrash crash = data.get(r);
 			
 			object[0] = crash.getRowID();
 			object[1] = crash.getYear();
@@ -363,65 +494,8 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 			tableModel.addRow(object);	
 		}
 		
-		calculateColumnSizes(sortTable);
-	}
-	
-	public void drawSearchTableData(ArrayList<VehicleCrash> searchResults) {
-		calculateColumnSizes(searchTable);
-		
-		tableModel.setRowCount(0);
-		for (int r = 0; r < searchResults.size(); r++) {
-			
-			Object[] object = new Object[64];
-			
-			VehicleCrash crash = searchResults.get(r);
-			
-			object[0] = crash.getRowID();
-			object[1] = crash.getYear();
-			object[2] = crash.getSeverity();
-			
-			int[] injuries = crash.getInjuries();
-			object[3] = injuries[0];
-			object[4] = injuries[1];
-			object[5] = injuries[2];
-			
-			object[6] = crash.getVehiclesInvolved();
-			object[7] = crash.getLocation();
-			object[8] = crash.isIntersection();
-			object[9] = crash.getJunctionType();
-			object[10] = crash.isFromSideRoad();
-			
-			
-			object[11] = crash.getCrashDistance();
-			object[12] = crash.isOnStateHighway();
-			object[13] = crash.getTerrainLevel();
-			object[14] = crash.getRoadCharacter();
-			object[15] = crash.getRoadCurvature();
-			object[16] = crash.getRoadMarking();
-			object[17] = crash.getRoadSurface();
-			object[18] = crash.isRoadIsWet();
-			object[19] = crash.getTrafficControl();
-			
-			
-			int[] speedLimits = crash.getSpeedLimits();
-			object[20] = speedLimits[0];
-			object[21] = speedLimits[1];
-			object[22] = speedLimits[2];
-			
-			object[23] = crash.getLightConditions();
-			object[24] = crash.getWeatherA();
-			object[25] = crash.getWeatherB();
-
-			int[] objectCollisions = crash.getCrashObjectsHit();
-			for	(int i = 0; i < 37; i++) {
-				
-				object[26 + i] = objectCollisions[i];
-			}
-			
-			tableModel.addRow(object);	
-		}
-		
-		calculateColumnSizes(searchTable);
+		calculateColumnSizes(table);
+		applyButton.setEnabled(true);
 	}
 
 	@Override
@@ -429,6 +503,16 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 
 		if (e.getSource().equals(categoryChoice) || e.getSource().equals(directionChoice)) {
 			if (sortLabel != null) sortLabel.setText("Sort by " + categoryChoice.getSelectedItem() + " " + directionChoice.getSelectedItem());
+		}
+		
+		if (e.getSource().equals(statsCategory)) {
+			
+			updateStatsBox();
+		}
+		
+		if (e.getSource().equals(statsCheckBox)) {
+			
+			updateStatsBox();
 		}
 	}
 
@@ -447,15 +531,18 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 		
 		if (e.getSource().equals(applyButton)) {
 			
+			System.out.println("Searching using filters...");
 			ArrayList<String> filters = getSearchFilters();
-			ArrayList<VehicleCrash> results = DataSearcher.searchWithFilters(crashData, filters);
-			drawSearchTableData(results);
+			searchData = DataSearcher.searchWithFilters(crashData, filters);
+			System.out.println("Search finished... Updating table");
+			drawTableData(searchData, searchTable, searchTableModel);
+			System.out.println("Successfully updated table\n");
 			if (filters.size() > 0) {
-				if (results.size() == 1) {
-					searchResultLabel.setText("\nSearch found " + results.size() + " result");
+				if (searchData.size() == 1) {
+					searchResultLabel.setText("Search found " + searchData.size() + " result");
 				}
 				else {
-					searchResultLabel.setText("\nSearch found " + results.size() + " results");
+					searchResultLabel.setText("Search found " + searchData.size() + " results");
 				}
 				searchResultLabel.setVisible(true);
 			}
@@ -474,8 +561,8 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 		System.out.println("Sorting data...");
 		Collections.sort(crashData, ds);
 		System.out.println("Sorting finished... Updating table");
-		drawTableData();
-		System.out.println("Successfully updated table");
+		drawTableData(crashData, sortingTable, sortingTableModel);
+		System.out.println("Successfully updated table\n");
 	}
 	
 	private void addSearchFilter() {
@@ -584,5 +671,57 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 		}
 		
 		return searchFilters;
+	}
+	
+	private void updateStatsBox() {
+		
+		if (statsCheckBox.getState() &&
+				searchData.size() > 0) {
+			
+			drawStatistics(searchData);
+			topTen = DataStatistics.getTopTen(searchData, statsCategory.getSelectedItem());
+			bottomTen = DataStatistics.getBottomTen(searchData, statsCategory.getSelectedItem());
+		}
+		else {
+			
+			drawStatistics(crashData);
+			topTen = DataStatistics.getTopTen(crashData, statsCategory.getSelectedItem());
+			bottomTen = DataStatistics.getBottomTen(crashData, statsCategory.getSelectedItem());
+		}
+		
+		drawTopTen();
+		drawBottomTen();
+		drawTableData(topTen, topTenTable, topTenTableModel);
+		drawTableData(bottomTen, bottomTenTable, bottomTenTableModel);
+	}
+	
+	private void drawStatistics(ArrayList<VehicleCrash> crashes) {
+		
+		String textAreaString = "";
+		
+		textAreaString += "Maximum: " + DataStatistics.getMax(crashes, statsCategory.getSelectedItem()) + "\n";
+		textAreaString += "Minimum: " + DataStatistics.getMin(crashes, statsCategory.getSelectedItem()) + "\n";
+		textAreaString += "Total: " + DataStatistics.getTotal(crashes, statsCategory.getSelectedItem()) + "\n";
+		double mean = DataStatistics.getMean(crashes, statsCategory.getSelectedItem());
+		textAreaString += "Mean: " + DataStatistics.round(mean, 2) + "\n";
+		textAreaString += "Median: " + DataStatistics.round(DataStatistics.getMedian(crashes, statsCategory.getSelectedItem()), 2) + "\n";
+		textAreaString += "Mode: " + DataStatistics.getMode(crashes, statsCategory.getSelectedItem()) + "\n";
+		double standardDeviation = DataStatistics.getStandardDeviation(crashes, statsCategory.getSelectedItem());
+		textAreaString += "Standard Deviation: " + DataStatistics.round(standardDeviation, 2) + "\n";
+		textAreaString += "1st Deviation: " + DataStatistics.getStandardDeviationLevel(1, standardDeviation, mean, true) + "\n";
+		textAreaString += "2nd Deviation: " + DataStatistics.getStandardDeviationLevel(2, standardDeviation, mean, true) + "\n";
+		textAreaString += "3rd Deviation: " + DataStatistics.getStandardDeviationLevel(3, standardDeviation, mean, true) + "\n";
+		
+		statsTextPane1.setText(textAreaString);
+	}
+	
+	private void drawTopTen() {
+		
+	
+	}
+	
+	private void drawBottomTen() {
+		
+		
 	}
 }

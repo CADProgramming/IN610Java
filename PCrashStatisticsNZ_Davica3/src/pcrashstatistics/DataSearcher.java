@@ -85,7 +85,8 @@ public class DataSearcher {
 				result = (((Boolean)crash.isFromSideRoad()).toString().equals(argument));
 				break;
 			case CRASH_DISTANCE:
-				result = compareValues(crash.getCrashDistance(), compareType, Integer.parseInt(argument));
+				int crashDistance = crash.getCrashDistance();
+				result = compareValues(crashDistance, compareType, Integer.parseInt(argument));
 				break;
 			case ON_STATE_HIGHWAY:
 				result = (((Boolean)crash.isOnStateHighway()).toString().equals(argument));

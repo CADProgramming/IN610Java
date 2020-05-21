@@ -40,10 +40,10 @@ public class DataSorter implements Comparator<VehicleCrash> {
 			compareValue = ((Integer)injuriesV1[InjuryType.FATAL.ordinal()]).compareTo(injuriesV2[InjuryType.FATAL.ordinal()]);
 			break;
 		case SERIOUS_INJURIES:
-			compareValue = ((Integer)injuriesV1[InjuryType.SERIOUS.ordinal()]).compareTo(injuriesV2[InjuryType.FATAL.ordinal()]);
+			compareValue = ((Integer)injuriesV1[InjuryType.SERIOUS.ordinal()]).compareTo(injuriesV2[InjuryType.SERIOUS.ordinal()]);
 			break;
 		case MINOR_INJURIES:
-			compareValue = ((Integer)injuriesV1[InjuryType.MINOR.ordinal()]).compareTo(injuriesV2[InjuryType.FATAL.ordinal()]);
+			compareValue = ((Integer)injuriesV1[InjuryType.MINOR.ordinal()]).compareTo(injuriesV2[InjuryType.MINOR.ordinal()]);
 			break;
 		case VEHICLES_INVOLVED:
 			compareValue = v1.getVehiclesInvolved().compareTo(v2.getVehiclesInvolved());
