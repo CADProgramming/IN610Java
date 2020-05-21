@@ -54,7 +54,7 @@ public class DataSearcher {
 				result = compareValues(year, compareType, Integer.parseInt(argument));
 				break;
 			case SEVERITY:
-				String severity = crash.getSeverity();
+				String severity = crash.getSeverity().toLowerCase();
 				result = compareValues(severity, compareType, argument);
 				break;
 			case FATALITIES:
@@ -67,18 +67,18 @@ public class DataSearcher {
 				result = compareValues(injuries[InjuryType.MINOR.ordinal()], compareType, Integer.parseInt(argument));
 				break;
 			case VEHICLES_INVOLVED:
-				String vehiclesInvolved = crash.getVehiclesInvolved();
+				String vehiclesInvolved = crash.getVehiclesInvolved().toLowerCase();
 				result = compareValues(vehiclesInvolved, compareType, argument);
 				break;
 			case LOCATION:
-				String location = crash.getLocation();
+				String location = crash.getLocation().toLowerCase();
 				result = compareValues(location, compareType, argument);
 				break;
 			case AT_INTERSECTION:
 				result = (((Boolean)crash.isIntersection()).toString().equals(argument));
 				break;
 			case JUNCTION_TYPE:
-				String junctionType = crash.getJunctionType();
+				String junctionType = crash.getJunctionType().toLowerCase();
 				result = compareValues(junctionType, compareType, argument);
 				break;
 			case FROM_SIDE_ROAD:
@@ -92,30 +92,30 @@ public class DataSearcher {
 				result = (((Boolean)crash.isOnStateHighway()).toString().equals(argument));
 				break;
 			case TERRAIN_LEVEL:
-				String terrainLevel = crash.getTerrainLevel();
+				String terrainLevel = crash.getTerrainLevel().toLowerCase();
 				result = compareValues(terrainLevel, compareType, argument);
 				break;
 			case ROAD_CHARACTER:
-				String roadCharacter = crash.getRoadCharacter();
+				String roadCharacter = crash.getRoadCharacter().toLowerCase();
 				result = compareValues(roadCharacter, compareType, argument);
 				break;
 			case ROAD_CURVATURE:
-				String roadCurvature = crash.getRoadCurvature();
+				String roadCurvature = crash.getRoadCurvature().toLowerCase();
 				result = compareValues(roadCurvature, compareType, argument);
 				break;
 			case ROAD_MARKINGS:
-				String roadMarking = crash.getRoadMarking();
+				String roadMarking = crash.getRoadMarking().toLowerCase();
 				result = compareValues(roadMarking, compareType, argument);
 				break;
 			case ROAD_SURFACE:
-				String roadSurface = crash.getRoadSurface();
+				String roadSurface = crash.getRoadSurface().toLowerCase();
 				result = compareValues(roadSurface, compareType, argument);
 				break;
 			case ROAD_IS_WET:
 				result = (((Boolean)crash.isRoadIsWet()).toString().equals(argument));
 				break;
 			case TRAFFIC_CONTROL:
-				String trafficControl = crash.getTrafficControl();
+				String trafficControl = crash.getTrafficControl().toLowerCase();
 				result = compareValues(trafficControl, compareType, argument);
 				break;
 			case SPEED_LIMIT:
@@ -128,15 +128,15 @@ public class DataSearcher {
 				result = compareValues(speedLimits[SpeedLimitType.TEMPORARY.ordinal()], compareType, Integer.parseInt(argument));
 				break;
 			case LIGHT:
-				String light = crash.getLightConditions();
+				String light = crash.getLightConditions().toLowerCase();
 				result = compareValues(light, compareType, argument);
 				break;
 			case WEATHER_A:
-				String weatherA = crash.getWeatherA();
+				String weatherA = crash.getWeatherA().toLowerCase();
 				result = compareValues(weatherA, compareType, argument);
 				break;
 			case WEATHER_B:
-				String weatherB = crash.getWeatherB();
+				String weatherB = crash.getWeatherB().toLowerCase();
 				result = compareValues(weatherB, compareType, argument);
 				break;
 			default:

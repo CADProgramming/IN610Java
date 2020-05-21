@@ -10,5 +10,4 @@ public class CrashStatisticsApp {
 
 		DataForm userInterface = new DataForm(crashData);
 	}
-
 }

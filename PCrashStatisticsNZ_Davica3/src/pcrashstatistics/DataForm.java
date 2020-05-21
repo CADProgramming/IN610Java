@@ -87,8 +87,8 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 	private JPanel controlPanel2;
 	private Choice statsCategory;
 	private Checkbox statsCheckBox;
-	private Choice choice_1;
-	private JSpinner spinner;
+	private Choice topBottomChoice;
+	private JSpinner topBottomNumSpinner;
 	private JLabel lblNewLabel_3;
 	private JTextPane statsTextPane1;
 	private JTextPane statsTextPane2;
@@ -98,6 +98,8 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 	private JScrollPane scrollPane_3;
 	private JTable topTenTable;
 	private JTable bottomTenTable;
+	private JLabel lblOfValue;
+	private JScrollPane scrollPane_4;
 	
 
 	public DataForm(ArrayList<VehicleCrash> crashData) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
@@ -248,6 +250,7 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 		statsPanel.add(dataPanel);
 		
 		statsTextPane1 = new JTextPane();
+		statsTextPane1.setEditable(false);
 		statsTextPane1.setFont(new Font("Tahoma", Font.PLAIN, 17));
 		statsTextPane1.setPreferredSize(new Dimension(320, 265));
 		statsTextPane1.setMinimumSize(new Dimension(6, 7));
@@ -294,23 +297,34 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 		displayPanel.setBounds(10, 418, 344, 404);
 		statsPanel.add(displayPanel);
 		
+		scrollPane_4 = new JScrollPane();
+		displayPanel.add(scrollPane_4);
+		
 		statsTextPane2 = new JTextPane();
+		statsTextPane2.setMaximumSize(new Dimension(320, 387));
+		scrollPane_4.setViewportView(statsTextPane2);
+		statsTextPane2.setEditable(false);
 		statsTextPane2.setPreferredSize(new Dimension(320, 387));
-		displayPanel.add(statsTextPane2);
 		
 		controlPanel2 = new JPanel();
 		controlPanel2.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		controlPanel2.setBounds(10, 361, 344, 46);
 		statsPanel.add(controlPanel2);
 		
-		lblNewLabel_3 = new JLabel("New label");
+		lblNewLabel_3 = new JLabel("Show ");
 		controlPanel2.add(lblNewLabel_3);
 		
-		spinner = new JSpinner();
-		controlPanel2.add(spinner);
+		topBottomChoice = new Choice();
+		topBottomChoice.add("Top 10 Table Data");
+		topBottomChoice.add("Bottom 10 Table Data");
+		controlPanel2.add(topBottomChoice);
 		
-		choice_1 = new Choice();
-		controlPanel2.add(choice_1);
+		lblOfValue = new JLabel(" at value: ");
+		controlPanel2.add(lblOfValue);
+		
+		topBottomNumSpinner = new JSpinner();
+		topBottomNumSpinner.setModel(new SpinnerNumberModel(1, 1, 10, 1));
+		controlPanel2.add(topBottomNumSpinner);
 		
 		scrollPane = new JScrollPane();
 		scrollPane.setLocation(new Point(100, 100));
@@ -406,6 +420,7 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 		repaint();
 		
 		updateStatsBox();
+		updateTopBottomStat();
 		drawTableData(crashData, sortingTable, sortingTableModel);
 		drawTableData(crashData, searchTable, searchTableModel);
 	}
@@ -664,7 +679,7 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 				String compareType = ((Choice)filterComponents[2]).getSelectedItem();
 				String argument = ((JTextField)filterComponents[4]).getText();
 				
-				String filterString = category + "," + compareType + "," + argument;
+				String filterString = category + "," + compareType + "," + argument.toLowerCase();
 				searchFilters.add(filterString);
 				
 			}
@@ -689,10 +704,20 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 			bottomTen = DataStatistics.getBottomTen(crashData, statsCategory.getSelectedItem());
 		}
 		
-		drawTopTen();
-		drawBottomTen();
 		drawTableData(topTen, topTenTable, topTenTableModel);
 		drawTableData(bottomTen, bottomTenTable, bottomTenTableModel);
+	}
+	
+	private void updateTopBottomStat() {
+		
+		if (topBottomChoice.getSelectedItem().equals("Top 10 Table Data")) {
+			
+			drawTopTen();
+		}
+		else {
+			
+			drawBottomTen();
+		}
 	}
 	
 	private void drawStatistics(ArrayList<VehicleCrash> crashes) {
@@ -717,11 +742,11 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 	
 	private void drawTopTen() {
 		
-	
+		statsTextPane2.setText(topTen.get((Integer)topBottomNumSpinner.getValue() - 1).toString());
 	}
 	
 	private void drawBottomTen() {
 		
-		
+		statsTextPane2.setText(bottomTen.get((Integer)topBottomNumSpinner.getValue() - 1).toString());
 	}
 }
