@@ -14,10 +14,12 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.border.EtchedBorder;
 import java.util.List;
 
-public class DataForm extends JFrame implements ItemListener, ActionListener {
+public class DataForm extends JFrame implements ItemListener, ActionListener, ChangeListener {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -38,6 +40,9 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 	private String[] boolSearchTerms = {
 			"At Intersection", "From Side Road", "On State Highway", "Road Is Wet"	
 	};
+	
+	private int itemViewerIndex;
+	private int itemViewerListSize;
 	
 	private JPanel contentPane;
 	private ArrayList<VehicleCrash> crashData;
@@ -100,6 +105,21 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 	private JTable bottomTenTable;
 	private JLabel lblOfValue;
 	private JScrollPane scrollPane_4;
+	private JPanel itemViewPanel;
+	private JPanel itemViewContainer;
+	private JPanel textAreaPanel;
+	private JTextPane itemView;
+	private JPanel btnControlPanel;
+	private JPanel leftButtons;
+	private JButton firstButton;
+	private JButton previousButton;
+	private JPanel checkBoxes;
+	private JCheckBox viewSearchData;
+	private JPanel rightButtons;
+	private JButton nextButton;
+	private JButton lastButton;
+	private JPanel infoPanel;
+	private JLabel itemViewIndexLabel;
 	
 
 	public DataForm(ArrayList<VehicleCrash> crashData) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
@@ -109,6 +129,9 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 		searchData = new ArrayList<VehicleCrash>();
 		topTen = new ArrayList<VehicleCrash>();
 		bottomTen = new ArrayList<VehicleCrash>();
+		
+		itemViewerIndex = 0;
+		itemViewerListSize = 0;
 		
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		Rectangle formSize = new Rectangle(0, 0, 1400, 900);
@@ -134,6 +157,75 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 		sortPanel = new JPanel();
 		tabbedPane.addTab("Sort Data", null, sortPanel, null);
 		sortPanel.setLayout(null);
+		
+		itemViewPanel = new JPanel();
+		tabbedPane.addTab("Item View", null, itemViewPanel, null);
+		itemViewPanel.setLayout(null);
+		
+		itemViewContainer = new JPanel();
+		itemViewContainer.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)), "Item Viewer", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		itemViewContainer.setBounds(10, 11, 1349, 801);
+		itemViewPanel.add(itemViewContainer);
+		itemViewContainer.setLayout(new BoxLayout(itemViewContainer, BoxLayout.Y_AXIS));
+		
+		textAreaPanel = new JPanel();
+		FlowLayout fl_textAreaPanel = (FlowLayout) textAreaPanel.getLayout();
+		fl_textAreaPanel.setVgap(25);
+		textAreaPanel.setMaximumSize(new Dimension(500, 550));
+		itemViewContainer.add(textAreaPanel);
+		
+		itemView = new JTextPane();
+		itemView.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		itemView.setPreferredSize(new Dimension(500, 500));
+		itemView.setMinimumSize(new Dimension(500, 500));
+		textAreaPanel.add(itemView);
+		
+		btnControlPanel = new JPanel();
+		btnControlPanel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		btnControlPanel.setMaximumSize(new Dimension(500, 50));
+		itemViewContainer.add(btnControlPanel);
+		btnControlPanel.setLayout(new BoxLayout(btnControlPanel, BoxLayout.X_AXIS));
+		
+		leftButtons = new JPanel();
+		leftButtons.setMaximumSize(new Dimension(300, 500));
+		btnControlPanel.add(leftButtons);
+		
+		firstButton = new JButton("<< First");
+		leftButtons.add(firstButton);
+		firstButton.addActionListener(this);
+		
+		previousButton = new JButton("< Previous");
+		leftButtons.add(previousButton);
+		previousButton.addActionListener(this);
+		
+		checkBoxes = new JPanel();
+		checkBoxes.setMaximumSize(new Dimension(75, 500));
+		btnControlPanel.add(checkBoxes);
+		
+		viewSearchData = new JCheckBox("Use search data");
+		checkBoxes.add(viewSearchData);
+		viewSearchData.addItemListener(this);
+		
+		rightButtons = new JPanel();
+		rightButtons.setMaximumSize(new Dimension(300, 500));
+		btnControlPanel.add(rightButtons);
+		
+		nextButton = new JButton("Next >");
+		rightButtons.add(nextButton);
+		nextButton.addActionListener(this);
+		
+		lastButton = new JButton("Last >>");
+		rightButtons.add(lastButton);
+		
+		infoPanel = new JPanel();
+		infoPanel.setMaximumSize(new Dimension(500, 32767));
+		itemViewContainer.add(infoPanel);
+		infoPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 75));
+		
+		itemViewIndexLabel = new JLabel("label");
+		itemViewIndexLabel.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		infoPanel.add(itemViewIndexLabel);
+		lastButton.addActionListener(this);
 		
 		searchPanel = new JPanel();
 		tabbedPane.addTab("Search Data", null, searchPanel, null);
@@ -298,6 +390,9 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 		statsPanel.add(displayPanel);
 		
 		scrollPane_4 = new JScrollPane();
+		scrollPane_4.setPreferredSize(new Dimension(320, 387));
+		scrollPane_4.setSize(new Dimension(320, 387));
+		scrollPane_4.setMaximumSize(new Dimension(320, 387));
 		displayPanel.add(scrollPane_4);
 		
 		statsTextPane2 = new JTextPane();
@@ -315,6 +410,7 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 		controlPanel2.add(lblNewLabel_3);
 		
 		topBottomChoice = new Choice();
+		topBottomChoice.addItemListener(this);
 		topBottomChoice.add("Top 10 Table Data");
 		topBottomChoice.add("Bottom 10 Table Data");
 		controlPanel2.add(topBottomChoice);
@@ -324,6 +420,7 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 		
 		topBottomNumSpinner = new JSpinner();
 		topBottomNumSpinner.setModel(new SpinnerNumberModel(1, 1, 10, 1));
+		topBottomNumSpinner.addChangeListener(this);
 		controlPanel2.add(topBottomNumSpinner);
 		
 		scrollPane = new JScrollPane();
@@ -419,6 +516,7 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 		
 		repaint();
 		
+		updateItemViewer();
 		updateStatsBox();
 		updateTopBottomStat();
 		drawTableData(crashData, sortingTable, sortingTableModel);
@@ -520,14 +618,20 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 			if (sortLabel != null) sortLabel.setText("Sort by " + categoryChoice.getSelectedItem() + " " + directionChoice.getSelectedItem());
 		}
 		
-		if (e.getSource().equals(statsCategory)) {
+		if (e.getSource().equals(statsCategory) || 
+				e.getSource().equals(statsCheckBox)) {
 			
 			updateStatsBox();
 		}
 		
-		if (e.getSource().equals(statsCheckBox)) {
+		if (e.getSource().equals(topBottomChoice)) {
 			
-			updateStatsBox();
+			updateTopBottomStat();
+		}
+		
+		if (e.getSource().equals(viewSearchData)) {
+			itemViewerIndex = 0;
+			updateItemViewer();
 		}
 	}
 
@@ -552,18 +656,81 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 			System.out.println("Search finished... Updating table");
 			drawTableData(searchData, searchTable, searchTableModel);
 			System.out.println("Successfully updated table\n");
+			
 			if (filters.size() > 0) {
+				
 				if (searchData.size() == 1) {
+					
 					searchResultLabel.setText("Search found " + searchData.size() + " result");
 				}
 				else {
+					
 					searchResultLabel.setText("Search found " + searchData.size() + " results");
 				}
+				
 				searchResultLabel.setVisible(true);
 			}
 			else {
+				
 				searchResultLabel.setVisible(false);
 			}
+		}
+		
+		if (e.getSource().equals(firstButton)) {
+					
+			itemViewerIndex = 0;
+			updateItemViewer();
+		}
+		
+		if (e.getSource().equals(previousButton)) {
+			
+			itemViewerIndex--;
+			updateItemViewer();
+		}
+		
+		if (e.getSource().equals(nextButton)) {
+			
+			itemViewerIndex++;
+			updateItemViewer();
+		}
+		
+		if (e.getSource().equals(lastButton)) {
+			
+			itemViewerIndex = itemViewerListSize - 1;
+			updateItemViewer();
+		}
+	}
+	
+	private void updateItemViewer() {
+		
+		if (viewSearchData.isSelected() &&
+				searchData.size() > 0) {
+			
+			itemViewerListSize = searchData.size();
+;			drawItemViewer(searchData);
+		}
+		else {
+			
+			itemViewerListSize = crashData.size();
+			drawItemViewer(crashData);
+		}
+		
+		if (itemViewerIndex == 0) {
+			
+			previousButton.setEnabled(false);
+		}
+		else {
+			
+			previousButton.setEnabled(true);
+		}
+
+		if (itemViewerIndex == itemViewerListSize - 1) {
+			
+			nextButton.setEnabled(false);
+		}
+		else {
+			
+			nextButton.setEnabled(true);
 		}
 	}
 	
@@ -704,6 +871,7 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 			bottomTen = DataStatistics.getBottomTen(crashData, statsCategory.getSelectedItem());
 		}
 		
+		updateTopBottomStat();
 		drawTableData(topTen, topTenTable, topTenTableModel);
 		drawTableData(bottomTen, bottomTenTable, bottomTenTableModel);
 	}
@@ -743,10 +911,26 @@ public class DataForm extends JFrame implements ItemListener, ActionListener {
 	private void drawTopTen() {
 		
 		statsTextPane2.setText(topTen.get((Integer)topBottomNumSpinner.getValue() - 1).toString());
+		statsTextPane2.setCaretPosition(0);
 	}
 	
 	private void drawBottomTen() {
 		
 		statsTextPane2.setText(bottomTen.get((Integer)topBottomNumSpinner.getValue() - 1).toString());
+		statsTextPane2.setCaretPosition(0);
+	}
+
+	@Override
+	public void stateChanged(ChangeEvent arg0) {
+		
+		if (arg0.getSource().equals(topBottomNumSpinner)) {
+			updateTopBottomStat();
+		}
+	}
+	
+	private void drawItemViewer(ArrayList<VehicleCrash> data) {
+		
+		itemView.setText(data.get(itemViewerIndex).toString());
+		itemViewIndexLabel.setText("Currently viewing: " + (itemViewerIndex + 1) + "/" + itemViewerListSize);
 	}
 }
