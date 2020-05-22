@@ -88,8 +88,8 @@ public class DataForm extends JFrame implements ItemListener, ActionListener, Ch
 	private JLabel searchResultLabel;
 	private JLabel gapLabel;
 	private JPanel controlPanel1;
-	private JPanel graph1Panel;
-	private JPanel graph2Panel;
+	private ChartPanel graph1Panel;
+	private ChartPanel graph2Panel;
 	private JPanel dataPanel;
 	private JPanel top10Panel;
 	private JPanel bottom10Panel;
@@ -331,15 +331,15 @@ public class DataForm extends JFrame implements ItemListener, ActionListener, Ch
 		statsCheckBox.addItemListener(this);
 		controlPanel1.add(statsCheckBox);
 		
-		graph1Panel = new JPanel();
-		graph1Panel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		graph1Panel.setBounds(364, 11, 497, 339);
-		statsPanel.add(graph1Panel);
-		
-		graph2Panel = new JPanel();
-		graph2Panel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		graph2Panel.setBounds(871, 11, 497, 339);
-		statsPanel.add(graph2Panel);
+//		graph1Panel = new JPanel();
+//		graph1Panel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+//		graph1Panel.setBounds(364, 11, 497, 339);
+//		statsPanel.add(graph1Panel);
+//		
+//		graph2Panel = new JPanel();
+//		graph2Panel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+//		graph2Panel.setBounds(871, 11, 497, 339);
+//		statsPanel.add(graph2Panel);
 		
 		dataPanel = new JPanel();
 		dataPanel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
@@ -625,7 +625,7 @@ public class DataForm extends JFrame implements ItemListener, ActionListener, Ch
 		if (e.getSource().equals(statsCategory) || 
 				e.getSource().equals(statsCheckBox)) {
 			
-			updateStatsBox();
+			updateStatsTab();
 		}
 		
 		if (e.getSource().equals(topBottomChoice)) {
@@ -879,23 +879,55 @@ public class DataForm extends JFrame implements ItemListener, ActionListener, Ch
 	
 	private void drawStatsPiGraph() {
 		
-		DefaultPieDataset data = new DefaultPieDataset();
-		int[] bucket = DataStatistics.getBucket(crashData, statsCategory.getSelectedItem()); //NOT ROW ID VERY BAD
-		
-		for (int value = 0; value < bucket.length; value++) {
-		
-			if (bucket[value] != 0) { 
+		if (!statsCategory.getSelectedItem().equals("Row ID")) {
+			
+			Component existingPanel = statsPanel.getComponentAt(364, 11);
+			
+			if (existingPanel != null) {
 				
-				data.setValue(((Integer)value).toString(), bucket[value]);
+				System.out.println("Exists");
+				statsPanel.remove(existingPanel);
+				statsPanel.repaint();
 			}
+			
+			DefaultPieDataset data = new DefaultPieDataset();
+			int[] bucket = DataStatistics.getBucket(crashData, statsCategory.getSelectedItem());
+			
+			for (int value = 0; value < bucket.length; value++) {
+			
+				if (bucket[value] != 0) { 
+					
+					data.setValue(((Integer)value).toString(), bucket[value]);
+				}
+			}
+			
+			JFreeChart chart = ChartFactory.createPieChart("Frequency of " + statsCategory.getSelectedItem(), data, true, true, Locale.ENGLISH);
+			
+			ChartPanel graphPanel = new ChartPanel(chart);
+			graphPanel.setVisible(true);
+			graphPanel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+			graphPanel.setBounds(364, 11, 497, 339);
+			statsPanel.add(graphPanel);
+			statsPanel.repaint();
 		}
-		
-		JFreeChart chart = ChartFactory.createPieChart("Frequency of " + statsCategory.getSelectedItem(), data, true, true, Locale.ENGLISH);
-		
-		ChartPanel graphPanel = new ChartPanel(chart);
-		graphPanel.setVisible(true);
-		
-		tabbedPane.addTab("Test Graph", graphPanel);
+		else {
+			
+			Component existingPanel = statsPanel.getComponentAt(364, 11);
+			
+			if (existingPanel != null) {
+				
+				statsPanel.remove(existingPanel);
+				statsPanel.repaint();
+			}
+			
+			JPanel graphPanel = new JPanel();
+			graphPanel.setVisible(true);
+			graphPanel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+			graphPanel.setBounds(364, 11, 497, 339);
+			graphPanel.add(new JLabel("Cannot display graph for Row ID"));
+			statsPanel.add(graphPanel);
+			statsPanel.repaint();
+		}
 	}
 	
 	private void drawStatsBarGraph() {
