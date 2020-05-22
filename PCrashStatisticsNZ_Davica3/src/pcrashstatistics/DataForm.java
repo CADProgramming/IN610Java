@@ -7,6 +7,10 @@ import java.util.Collections;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.*;
+
+import org.jfree.chart.*;
+import org.jfree.data.general.DefaultPieDataset;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,6 +22,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.border.EtchedBorder;
 import java.util.List;
+import java.util.Locale;
 
 public class DataForm extends JFrame implements ItemListener, ActionListener, ChangeListener {
 
@@ -517,8 +522,7 @@ public class DataForm extends JFrame implements ItemListener, ActionListener, Ch
 		repaint();
 		
 		updateItemViewer();
-		updateStatsBox();
-		updateTopBottomStat();
+		updateStatsTab();
 		drawTableData(crashData, sortingTable, sortingTableModel);
 		drawTableData(crashData, searchTable, searchTableModel);
 	}
@@ -853,6 +857,55 @@ public class DataForm extends JFrame implements ItemListener, ActionListener, Ch
 		}
 		
 		return searchFilters;
+	}
+	
+	private void updateStatsTab() {
+		
+		drawStatsPiGraph();
+		List<String> columnListStr = Arrays.asList(stringSearchTerms);
+		List<String> columnListBool = Arrays.asList(stringSearchTerms);
+		if (columnListStr.contains(statsCategory.getSelectedItem()) ||
+				columnListBool.contains(statsCategory.getSelectedItem())) {
+			
+			drawStatsBarGraph();
+		}
+		else {
+			
+			drawStatsStanDevGraph();
+		}
+		updateStatsBox();
+		updateTopBottomStat();
+	}
+	
+	private void drawStatsPiGraph() {
+		
+		DefaultPieDataset data = new DefaultPieDataset();
+		int[] bucket = DataStatistics.getBucket(crashData, statsCategory.getSelectedItem()); //NOT ROW ID VERY BAD
+		
+		for (int value = 0; value < bucket.length; value++) {
+		
+			if (bucket[value] != 0) { 
+				
+				data.setValue(((Integer)value).toString(), bucket[value]);
+			}
+		}
+		
+		JFreeChart chart = ChartFactory.createPieChart("Frequency of " + statsCategory.getSelectedItem(), data, true, true, Locale.ENGLISH);
+		
+		ChartPanel graphPanel = new ChartPanel(chart);
+		graphPanel.setVisible(true);
+		
+		tabbedPane.addTab("Test Graph", graphPanel);
+	}
+	
+	private void drawStatsBarGraph() {
+		
+		
+	}
+	
+	private void drawStatsStanDevGraph() {
+		
+		
 	}
 	
 	private void updateStatsBox() {

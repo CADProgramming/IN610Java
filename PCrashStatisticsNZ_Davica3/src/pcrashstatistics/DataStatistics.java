@@ -140,14 +140,7 @@ public static ArrayList<VehicleCrash> getTopTen(ArrayList<VehicleCrash> crashDat
 	
 	public static int getMode(ArrayList<VehicleCrash> crashData, String dataName) {
 		
-		int bucketSize = getMax(crashData, dataName);
-		int[] bucket = new int[bucketSize + 1];
-		
-		for (VehicleCrash crash : crashData) {
-			
-			int bucketIndex = getValue(crash, dataName);
-			bucket[bucketIndex]++;
-		}
+		int[] bucket = getBucket(crashData, dataName);
 		
 		int max = 0;
 		int maxIndex = 0;
@@ -161,6 +154,20 @@ public static ArrayList<VehicleCrash> getTopTen(ArrayList<VehicleCrash> crashDat
 		}
 		
 		return maxIndex;
+	}
+	
+	public static int[] getBucket(ArrayList<VehicleCrash> crashData, String dataName) {
+		
+		int bucketSize = getMax(crashData, dataName);
+		int[] bucket = new int[bucketSize + 1];
+		
+		for (VehicleCrash crash : crashData) {
+			
+			int bucketIndex = getValue(crash, dataName);
+			bucket[bucketIndex]++;
+		}
+		
+		return bucket;
 	}
 	
 	public static double getStandardDeviation(ArrayList<VehicleCrash> crashData, String dataName) {
