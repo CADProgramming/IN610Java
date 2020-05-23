@@ -9,6 +9,14 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.*;
 
 import org.jfree.chart.*;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.plot.PiePlot;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.renderer.category.StandardBarPainter;
+import org.jfree.data.category.CategoryDataset;
+import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
 
 import java.awt.*;
@@ -88,8 +96,6 @@ public class DataForm extends JFrame implements ItemListener, ActionListener, Ch
 	private JLabel searchResultLabel;
 	private JLabel gapLabel;
 	private JPanel controlPanel1;
-	private ChartPanel graph1Panel;
-	private ChartPanel graph2Panel;
 	private JPanel dataPanel;
 	private JPanel top10Panel;
 	private JPanel bottom10Panel;
@@ -317,13 +323,9 @@ public class DataForm extends JFrame implements ItemListener, ActionListener, Ch
 		
 		statsCategory = new Choice();
 		statsCategory.addItemListener(this);
-		List<String> stringTermList = Arrays.asList(stringSearchTerms);
-		List<String> boolTermList = Arrays.asList(boolSearchTerms);
 		for (String category : columnHeaders) {
-			if (!stringTermList.contains(category) &&
-					!boolTermList.contains(category)) {
-				statsCategory.add(category);
-			}
+			
+			statsCategory.add(category);
 		}
 		controlPanel1.add(statsCategory);
 		
@@ -630,7 +632,7 @@ public class DataForm extends JFrame implements ItemListener, ActionListener, Ch
 		
 		if (e.getSource().equals(topBottomChoice)) {
 			
-			updateTopBottomStat();
+			updateStatsBox();
 		}
 		
 		if (e.getSource().equals(viewSearchData)) {
@@ -861,47 +863,90 @@ public class DataForm extends JFrame implements ItemListener, ActionListener, Ch
 	
 	private void updateStatsTab() {
 		
-		drawStatsPiGraph();
-		List<String> columnListStr = Arrays.asList(stringSearchTerms);
-		List<String> columnListBool = Arrays.asList(stringSearchTerms);
-		if (columnListStr.contains(statsCategory.getSelectedItem()) ||
-				columnListBool.contains(statsCategory.getSelectedItem())) {
+		if (statsCheckBox.getState() && 
+				searchData.size() > 0) {
 			
-			drawStatsBarGraph();
+			drawStatsPiGraph(searchData);
+			drawStatsBarGraph(searchData);
 		}
 		else {
 			
-			drawStatsStanDevGraph();
+			drawStatsPiGraph(crashData);
+			drawStatsBarGraph(crashData);
 		}
 		updateStatsBox();
-		updateTopBottomStat();
 	}
 	
-	private void drawStatsPiGraph() {
+	private void drawStatsPiGraph(ArrayList<VehicleCrash> graphData) {
 		
-		if (!statsCategory.getSelectedItem().equals("Row ID")) {
+		String dataName = statsCategory.getSelectedItem();
+		
+		if (!dataName.equals("Row ID")) {
 			
 			Component existingPanel = statsPanel.getComponentAt(364, 11);
 			
 			if (existingPanel != null) {
 				
-				System.out.println("Exists");
 				statsPanel.remove(existingPanel);
 				statsPanel.repaint();
 			}
 			
 			DefaultPieDataset data = new DefaultPieDataset();
-			int[] bucket = DataStatistics.getBucket(crashData, statsCategory.getSelectedItem());
+			
+			int maxBucketVal = 0;
+			List<String> columnListStr = Arrays.asList(stringSearchTerms);
+			List<String> columnListBool = Arrays.asList(boolSearchTerms);
+
+			if (!columnListStr.contains(dataName) &&
+					!columnListBool.contains(dataName)) {
+				
+				maxBucketVal = DataStatistics.getMax(graphData, dataName);
+			}
+			else {
+				
+				maxBucketVal = DataStatistics.getDataValuesString(graphData, dataName).length;
+			}
+			
+			int[] bucket = new int[maxBucketVal];
+			
+			if (!columnListStr.contains(dataName) &&
+					!columnListBool.contains(dataName)) {
+				
+				bucket = DataStatistics.getBucket(graphData, dataName);
+			}
+			else {
+				
+				bucket = DataStatistics.getBucketString(graphData, dataName);
+			}
 			
 			for (int value = 0; value < bucket.length; value++) {
 			
-				if (bucket[value] != 0) { 
+				if (!dataName.equals("Crash Distance")) {
 					
-					data.setValue(((Integer)value).toString(), bucket[value]);
+					if (bucket[value] != 0) { 
+						
+						if (!columnListStr.contains(dataName) &&
+								!columnListBool.contains(dataName)) {
+						
+							data.setValue(((Integer)value).toString(), bucket[value]);
+						}
+						else {
+							
+							String[] valueNames = DataStatistics.getDataValuesString(graphData, dataName);
+							data.setValue(valueNames[value], bucket[value]);
+						}
+					}
+				}
+				else {
+					if (bucket[value] != 0) { 
+						
+						data.setValue(((Integer)(value * 1000)).toString() + " - " + ((Integer)((value + 1) * 1000)).toString(), bucket[value]);
+					}
 				}
 			}
 			
-			JFreeChart chart = ChartFactory.createPieChart("Frequency of " + statsCategory.getSelectedItem(), data, true, true, Locale.ENGLISH);
+			JFreeChart chart = ChartFactory.createPieChart("Frequency of " + dataName, data, true, true, Locale.ENGLISH);
+			if (dataName.equals("Crash Distance")) ((PiePlot) chart.getPlot()).setLabelGenerator(null);
 			
 			ChartPanel graphPanel = new ChartPanel(chart);
 			graphPanel.setVisible(true);
@@ -930,86 +975,260 @@ public class DataForm extends JFrame implements ItemListener, ActionListener, Ch
 		}
 	}
 	
-	private void drawStatsBarGraph() {
+	private void drawStatsBarGraph(ArrayList<VehicleCrash> graphData) {
 		
+		String dataName = statsCategory.getSelectedItem();
 		
-	}
+		if (!dataName.equals("Row ID")) {
+			
+			Component existingPanel = statsPanel.getComponentAt(871, 11);
+			
+			if (existingPanel != null) {
+				
+				statsPanel.remove(existingPanel);
+				statsPanel.repaint();
+			}
+			
+			DefaultCategoryDataset  data = new DefaultCategoryDataset ();
+			
+			int maxBucketVal = 0;
+			String secondLine = "";
+			List<String> columnListStr = Arrays.asList(stringSearchTerms);
+			List<String> columnListBool = Arrays.asList(boolSearchTerms);
+
+			if (!columnListStr.contains(dataName) &&
+					!columnListBool.contains(dataName)) {
+				
+				secondLine = "\nWhere x > 0";
+				maxBucketVal = DataStatistics.getMax(graphData, dataName);
+			}
+			else {
+				
+				maxBucketVal = DataStatistics.getDataValuesString(graphData, dataName).length;
+			}
+			
+			int[] bucket = new int[maxBucketVal];
+			
+			if (!columnListStr.contains(dataName) &&
+					!columnListBool.contains(dataName)) {
+				
+				bucket = DataStatistics.getBucket(graphData, dataName);
+			}
+			else {
+				
+				bucket = DataStatistics.getBucketString(graphData, dataName);
+			}
+			
+			if (!dataName.equals("Crash Distance")) {
+				
+				if (!columnListStr.contains(dataName) &&
+						!columnListBool.contains(dataName)) {
+				
+					for (int value = 1; value < bucket.length; value++) {
+						
+						if (bucket[value] != 0) {
+							
+							data.addValue(bucket[value], dataName, ((Integer)value).toString());
+						}
+					}
+				}
+				else {
+					
+					for (int value = 0; value < bucket.length; value++) {
+						
+						String[] valueNames = DataStatistics.getDataValuesString(graphData, dataName);
+						data.addValue(bucket[value], dataName, valueNames[value]);
+					}
+				}
+			}
+			else {
 	
-	private void drawStatsStanDevGraph() {
-		
-		
+				for (int value = 1; value < bucket.length; value++) {
+				
+					if (bucket[value] != 0) { 
+						
+						data.addValue(bucket[value], dataName, ((Integer)(value * 1000)).toString() + " - " + ((Integer)((value + 1) * 1000)).toString());
+					}
+				}
+			}
+			
+			ChartFactory.setChartTheme(StandardChartTheme.createLegacyTheme());
+			BarRenderer.setDefaultBarPainter(new StandardBarPainter());
+			
+			JFreeChart chart = ChartFactory.createBarChart("Frequency of " + dataName + secondLine, "Amount", "Frequency", (CategoryDataset) data, PlotOrientation.VERTICAL, true, true, false);
+			
+			if ((data.getColumnKey(0).toString().length() > 3 ||
+					data.getColumnKey(1).toString().length() > 3) &&
+					data.getColumnCount() > 4) {
+				
+				CategoryAxis axis = chart.getCategoryPlot().getDomainAxis();
+				axis.setCategoryLabelPositions(CategoryLabelPositions.UP_45);
+			}
+			
+			ChartPanel graphPanel = new ChartPanel(chart);
+			graphPanel.setVisible(true);
+			graphPanel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+			graphPanel.setBounds(871, 11, 497, 339);
+			statsPanel.add(graphPanel);
+			statsPanel.repaint();
+		}
+		else {
+			
+			Component existingPanel = statsPanel.getComponentAt(871, 11);
+			
+			if (existingPanel != null) {
+				
+				statsPanel.remove(existingPanel);
+				statsPanel.repaint();
+			}
+			
+			JPanel graphPanel = new JPanel();
+			graphPanel.setVisible(true);
+			graphPanel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+			graphPanel.setBounds(871, 11, 497, 339);
+			graphPanel.add(new JLabel("Cannot display graph for Row ID"));
+			statsPanel.add(graphPanel);
+			statsPanel.repaint();
+		}
 	}
 	
 	private void updateStatsBox() {
+		
+		List<String> columnListStr = Arrays.asList(stringSearchTerms);
+		List<String> columnListBool = Arrays.asList(boolSearchTerms);
+		String dataName = statsCategory.getSelectedItem();
 		
 		if (statsCheckBox.getState() &&
 				searchData.size() > 0) {
 			
 			drawStatistics(searchData);
-			topTen = DataStatistics.getTopTen(searchData, statsCategory.getSelectedItem());
-			bottomTen = DataStatistics.getBottomTen(searchData, statsCategory.getSelectedItem());
+			if (!columnListStr.contains(dataName) &&
+					!columnListBool.contains(dataName)) {
+				
+				topTen = DataStatistics.getTopTen(searchData, dataName);
+				bottomTen = DataStatistics.getBottomTen(searchData, dataName);
+			}
+			else {
+				
+				topTen.clear();
+				bottomTen.clear();
+			}
+			updateTopBottomStat(searchData, dataName);
 		}
 		else {
 			
 			drawStatistics(crashData);
-			topTen = DataStatistics.getTopTen(crashData, statsCategory.getSelectedItem());
-			bottomTen = DataStatistics.getBottomTen(crashData, statsCategory.getSelectedItem());
+			if (!columnListStr.contains(dataName) &&
+					!columnListBool.contains(dataName)) {
+				
+				topTen = DataStatistics.getTopTen(crashData, dataName);
+				bottomTen = DataStatistics.getBottomTen(crashData, dataName);
+			}
+			else {
+				
+				topTen.clear();
+				bottomTen.clear();
+			}
+			updateTopBottomStat(crashData, dataName);
 		}
 		
-		updateTopBottomStat();
 		drawTableData(topTen, topTenTable, topTenTableModel);
 		drawTableData(bottomTen, bottomTenTable, bottomTenTableModel);
 	}
 	
-	private void updateTopBottomStat() {
+	private void updateTopBottomStat(ArrayList<VehicleCrash> data, String dataName) {
 		
 		if (topBottomChoice.getSelectedItem().equals("Top 10 Table Data")) {
 			
-			drawTopTen();
+			drawTopTen(data, dataName);
 		}
 		else {
 			
-			drawBottomTen();
+			drawBottomTen(data, dataName);
 		}
 	}
 	
 	private void drawStatistics(ArrayList<VehicleCrash> crashes) {
 		
 		String textAreaString = "";
+		String dataName = statsCategory.getSelectedItem();
 		
-		textAreaString += "Maximum: " + DataStatistics.getMax(crashes, statsCategory.getSelectedItem()) + "\n(See Top 10 Table)\n";
-		textAreaString += "Minimum: " + DataStatistics.getMin(crashes, statsCategory.getSelectedItem()) + "\n(See Bottom 10 Table)\n";
-		textAreaString += "Total: " + DataStatistics.getTotal(crashes, statsCategory.getSelectedItem()) + "\n";
-		double mean = DataStatistics.getMean(crashes, statsCategory.getSelectedItem());
-		textAreaString += "Mean: " + DataStatistics.round(mean, 2) + "\n";
-		textAreaString += "Median: " + DataStatistics.round(DataStatistics.getMedian(crashes, statsCategory.getSelectedItem()), 2) + "\n";
-		textAreaString += "Mode: " + DataStatistics.getMode(crashes, statsCategory.getSelectedItem()) + "\n";
-		double standardDeviation = DataStatistics.getStandardDeviation(crashes, statsCategory.getSelectedItem());
-		textAreaString += "Standard Deviation: " + DataStatistics.round(standardDeviation, 2) + "\n";
-		textAreaString += "1st Deviation: " + DataStatistics.getStandardDeviationLevel(1, standardDeviation, mean, true) + "\n";
-		textAreaString += "2nd Deviation: " + DataStatistics.getStandardDeviationLevel(2, standardDeviation, mean, true) + "\n";
-		textAreaString += "3rd Deviation: " + DataStatistics.getStandardDeviationLevel(3, standardDeviation, mean, true) + "\n";
+		List<String> columnListStr = Arrays.asList(stringSearchTerms);
+		List<String> columnListBool = Arrays.asList(boolSearchTerms);
+
+		if (!columnListStr.contains(dataName) &&
+				!columnListBool.contains(dataName)) {
+			
+			textAreaString += "Maximum: " + DataStatistics.getMax(crashes, dataName) + "\n(See Top 10 Table)\n";
+			textAreaString += "Minimum: " + DataStatistics.getMin(crashes, dataName) + "\n(See Bottom 10 Table)\n";
+			textAreaString += "Total: " + DataStatistics.getTotal(crashes, dataName) + "\n";
+			textAreaString += "Mode: " + DataStatistics.getMode(crashes, dataName) + "\n";
+		}
+		
+		if (columnListStr.contains(dataName) ||
+				columnListBool.contains(dataName)) {
+			
+			String[] valueNames = DataStatistics.getDataValuesString(crashes, dataName);
+			textAreaString += "Mode: " + valueNames[DataStatistics.getModeString(crashes, dataName)] + "\n";
+		}
+		
+		if (!columnListStr.contains(dataName) &&
+				!columnListBool.contains(dataName)) {
+			
+			double mean = DataStatistics.getMean(crashes, dataName);
+			textAreaString += "Mean: " + DataStatistics.round(mean, 2) + "\n";
+			textAreaString += "Median: " + DataStatistics.round(DataStatistics.getMedian(crashes, dataName), 2) + "\n";
+			double standardDeviation = DataStatistics.getStandardDeviation(crashes, dataName);
+			textAreaString += "Standard Deviation: " + DataStatistics.round(standardDeviation, 2) + "\n";
+			textAreaString += "1st Deviation: " + DataStatistics.getStandardDeviationLevel(1, standardDeviation, mean, true) + "\n";
+			textAreaString += "2nd Deviation: " + DataStatistics.getStandardDeviationLevel(2, standardDeviation, mean, true) + "\n";
+			textAreaString += "3rd Deviation: " + DataStatistics.getStandardDeviationLevel(3, standardDeviation, mean, true) + "\n";
+		}
 		
 		statsTextPane1.setText(textAreaString);
 	}
 	
-	private void drawTopTen() {
+	private void drawTopTen(ArrayList<VehicleCrash> data, String dataName) {
 		
-		statsTextPane2.setText(topTen.get((Integer)topBottomNumSpinner.getValue() - 1).toString());
-		statsTextPane2.setCaretPosition(0);
+		if (topTen.size() > 0) {
+			
+			statsTextPane2.setFont(new Font("Tahoma", Font.PLAIN, 11));
+			statsTextPane2.setText(topTen.get((Integer)topBottomNumSpinner.getValue() - 1).toString());
+			statsTextPane2.setCaretPosition(0);
+			topBottomNumSpinner.setEnabled(true);
+		}
+		else {
+			
+			statsTextPane2.setFont(new Font("Tahoma", Font.PLAIN, 15));
+			statsTextPane2.setText(DataStatistics.getTopTenString(data, dataName));
+			statsTextPane2.setCaretPosition(0);
+			topBottomNumSpinner.setEnabled(false);
+		}
 	}
 	
-	private void drawBottomTen() {
+	private void drawBottomTen(ArrayList<VehicleCrash> data, String dataName) {
 		
-		statsTextPane2.setText(bottomTen.get((Integer)topBottomNumSpinner.getValue() - 1).toString());
-		statsTextPane2.setCaretPosition(0);
+		if (bottomTen.size() > 0) {
+			
+			statsTextPane2.setFont(new Font("Tahoma", Font.PLAIN, 11));
+			statsTextPane2.setText(bottomTen.get((Integer)topBottomNumSpinner.getValue() - 1).toString());
+			statsTextPane2.setCaretPosition(0);
+			topBottomNumSpinner.setEnabled(true);
+		}
+		else {
+			
+			statsTextPane2.setFont(new Font("Tahoma", Font.PLAIN, 15));
+			statsTextPane2.setText(DataStatistics.getBottomTenString(data, dataName));
+			statsTextPane2.setCaretPosition(0);
+			topBottomNumSpinner.setEnabled(false);
+		}
 	}
 
 	@Override
 	public void stateChanged(ChangeEvent arg0) {
 		
 		if (arg0.getSource().equals(topBottomNumSpinner)) {
-			updateTopBottomStat();
+			updateStatsBox();
 		}
 	}
 	

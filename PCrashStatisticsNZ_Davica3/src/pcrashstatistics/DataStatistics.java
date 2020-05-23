@@ -1,7 +1,6 @@
 package pcrashstatistics;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.TreeSet;
 
@@ -79,14 +78,72 @@ public static ArrayList<VehicleCrash> getTopTen(ArrayList<VehicleCrash> crashDat
 		return bottomTen;
 	}
 	
-	public static TreeSet<VehicleCrash> getTopTenString(ArrayList<VehicleCrash> crashData, String dataName) {
+	public static String getTopTenString(ArrayList<VehicleCrash> crashData, String dataName) {
 		
-		return null;
+		String topTenString = "";
+		String[] values = getDataValuesString(crashData, dataName);
+		int[] bucket = getBucketString(crashData, dataName);
+		
+		int itemCount = 10;
+		for (int i = 0; i < bucket.length - 1; i++) {
+			
+			for (int n = 0; n < bucket.length - 1; n++) {
+				
+				if (bucket[n] < bucket[n + 1]) {
+					
+					int temp = bucket[n];
+					bucket[n] = bucket[n + 1];
+					bucket[n + 1] = temp;
+					
+					String tempString = values[n];
+					values[n] = values[n + 1];
+					values[n + 1] = tempString;
+				}
+			}
+		}
+		
+		if (values.length < itemCount) itemCount = values.length;
+		
+		for (int i = 0; i < itemCount; i++) {
+			
+			topTenString += "#" + (i + 1) + " - " + values[i] + ": " + bucket[i] + "\n";
+		}
+		
+		return topTenString;
 	}
 	
-	public static TreeSet<VehicleCrash> getBottomTenString(ArrayList<VehicleCrash> crashData, String dataName) {
+	public static String getBottomTenString(ArrayList<VehicleCrash> crashData, String dataName) {
 		
-		return null;
+		String bottomTenString = "";
+		String[] values = getDataValuesString(crashData, dataName);
+		int[] bucket = getBucketString(crashData, dataName);
+		
+		int itemCount = 10;
+		for (int i = 0; i < bucket.length - 1; i++) {
+			
+			for (int n = 0; n < bucket.length - 1; n++) {
+				
+				if (bucket[n] > bucket[n + 1]) {
+					
+					int temp = bucket[n];
+					bucket[n] = bucket[n + 1];
+					bucket[n + 1] = temp;
+					
+					String tempString = values[n];
+					values[n] = values[n + 1];
+					values[n + 1] = tempString;
+				}
+			}
+		}
+		
+		if (values.length < itemCount) itemCount = values.length;
+		
+		for (int i = 0; i < itemCount; i++) {
+			
+			bottomTenString += "#" + (i + 1) + " - " + values[i] + ": " + bucket[i] + "\n";
+		}
+		
+		return bottomTenString;
 	}
 	
 	public static long getTotal(ArrayList<VehicleCrash> crashData, String dataName) {
@@ -156,14 +213,122 @@ public static ArrayList<VehicleCrash> getTopTen(ArrayList<VehicleCrash> crashDat
 		return maxIndex;
 	}
 	
+	public static int getModeString(ArrayList<VehicleCrash> crashData, String dataName) {
+		
+		int[] bucket = getBucketString(crashData, dataName);
+		
+		int max = 0;
+		int maxIndex = 0;
+		
+		for (int i = 0; i < bucket.length; i++) {
+			
+			if (bucket[i] > max) {
+				max = bucket[i];
+				maxIndex = i;
+			}
+		}
+		
+		return maxIndex;
+	}
+	
 	public static int[] getBucket(ArrayList<VehicleCrash> crashData, String dataName) {
 		
 		int bucketSize = getMax(crashData, dataName);
+		if (dataName.equals("Crash Distance")) bucketSize /= 1000;
 		int[] bucket = new int[bucketSize + 1];
 		
 		for (VehicleCrash crash : crashData) {
 			
-			int bucketIndex = getValue(crash, dataName);
+			int bucketIndex = 0;
+			if (dataName.equals("Crash Distance")) {
+				
+				bucketIndex = getValue(crash, dataName) / 1000;
+			}
+			else {
+				
+				bucketIndex = getValue(crash, dataName);
+			}
+			bucket[bucketIndex]++;
+		}
+		
+		return bucket;
+	}
+
+	public static int[] getBucketString(ArrayList<VehicleCrash> crashData, String dataName) {
+		
+		String[] valuesArray = getDataValuesString(crashData, dataName);
+		int[] bucket = new int[valuesArray.length];
+		
+		for (VehicleCrash crash : crashData) {
+			
+			String crashValue = getValueString(crash, dataName);
+			int index = -1;
+			for (int i = 0; i < valuesArray.length; i++) {
+				
+				if (dataName.equals("Location")) {
+					
+					if ((crashValue.split(",")[0]).equals(valuesArray[i])) {
+						
+						index = i;
+						break;
+					}
+				}
+				else {
+					
+					if (crashValue.equals(valuesArray[i])) {
+						
+						index = i;
+						break;
+					}
+				}
+			}
+			
+			if (index != -1) {
+				bucket[index]++;
+			}
+		}
+		
+		return bucket;
+	}
+	
+	public static String[] getDataValuesString(ArrayList<VehicleCrash> crashData, String dataName) {
+		
+		TreeSet<String> values = new TreeSet<String>();
+		
+		for (VehicleCrash crash : crashData) {
+			
+			String value = getValueString(crash, dataName);
+			
+			if (dataName.equals("Location")) {
+				
+				values.add(value.split(",")[0]);
+			}
+			else {
+				
+				values.add(value);
+			}
+		}
+
+		String[] valuesArray = new String[values.size()];
+		int count = 0;
+		
+		for (String value : values) {
+			
+			valuesArray[count] = value;
+			count++;
+		}
+		
+		return valuesArray;
+	}
+
+	public static int[] getBucketCrashDistance(ArrayList<VehicleCrash> crashData, String dataName) {
+		
+		int bucketSize = getMax(crashData, dataName);
+		int[] bucket = new int[(bucketSize / 1000) + 1];
+		
+		for (VehicleCrash crash : crashData) {
+			
+			int bucketIndex = getValue(crash, dataName) / 1000;
 			bucket[bucketIndex]++;
 		}
 		
@@ -253,6 +418,71 @@ public static ArrayList<VehicleCrash> getTopTen(ArrayList<VehicleCrash> crashDat
 			break;
 		default:
 			value = (Integer)crashObjects[category.ordinal() - ColumnData.ANIMALS_HIT.ordinal()];
+			break;
+		}
+		
+		return value;
+	}
+	
+	private static String getValueString(VehicleCrash crash, String dataName) {
+		
+		String categoryString = dataName.toUpperCase().replace(" ", "_");
+		ColumnData category = ColumnData.valueOf(categoryString);
+		String value = "";
+		
+		switch (category) {
+		case SEVERITY:
+			value = crash.getSeverity();
+			break;
+		case VEHICLES_INVOLVED:
+			value = crash.getVehiclesInvolved();
+			break;
+		case LOCATION:
+			value = crash.getLocation();
+			break;
+		case AT_INTERSECTION:
+			value = ((Boolean)crash.isIntersection()).toString();
+			break;
+		case JUNCTION_TYPE:
+			value = crash.getJunctionType();
+			break;
+		case FROM_SIDE_ROAD:
+			value = ((Boolean)crash.isFromSideRoad()).toString();
+			break;
+		case ON_STATE_HIGHWAY:
+			value = ((Boolean)crash.isOnStateHighway()).toString();
+			break;
+		case TERRAIN_LEVEL:
+			value = crash.getTerrainLevel();
+			break;
+		case ROAD_CHARACTER:
+			value = crash.getRoadCharacter();
+			break;
+		case ROAD_CURVATURE:
+			value = crash.getRoadCurvature();
+			break;
+		case ROAD_MARKINGS:
+			value = crash.getRoadMarking();
+			break;
+		case ROAD_SURFACE:
+			value = crash.getRoadSurface();
+			break;
+		case ROAD_IS_WET:
+			value = ((Boolean)crash.isRoadIsWet()).toString();
+			break;
+		case TRAFFIC_CONTROL:
+			value = crash.getTrafficControl();
+			break;
+		case LIGHT:
+			value = crash.getLightConditions();
+			break;
+		case WEATHER_A:
+			value = crash.getWeatherA();
+			break;
+		case WEATHER_B:
+			value = crash.getWeatherB();
+			break;
+		default:
 			break;
 		}
 		
