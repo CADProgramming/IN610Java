@@ -4,8 +4,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.TreeSet;
 
+/**
+ * A class that calculates statistical values about the data set provided
+ * @author Clayton Davidson
+ *
+ */
 public class DataStatistics {
 
+/**
+ * Gets the maximum value of the specified data category
+ * @param crashData Data set to examine
+ * @param dataName Category to calculate for
+ * @return Returns an integer representing the max value
+ */
 public static int getMax(ArrayList<VehicleCrash> crashData, String dataName) {
 		
 		int max = 0;
@@ -21,6 +32,12 @@ public static int getMax(ArrayList<VehicleCrash> crashData, String dataName) {
 		return max;
 	}
 	
+	/**
+	 * Gets the minimum value of the specified data category
+	 * @param crashData Data set to examine
+	 * @param dataName Category to calculate for
+	 * @return Returns an integer representing the min value
+	 */
 	public static int getMin(ArrayList<VehicleCrash> crashData, String dataName) {
 		
 		int min = getValue(crashData.get(0), dataName);
@@ -36,6 +53,12 @@ public static int getMax(ArrayList<VehicleCrash> crashData, String dataName) {
 		return min;
 	}
 	
+/**
+ * Gets the top ten objects of a category
+ * @param crashData Data set to use
+ * @param dataName Category to get values from
+ * @return Returns an ArrayList of object VehicleCrash
+ */
 public static ArrayList<VehicleCrash> getTopTen(ArrayList<VehicleCrash> crashData, String dataName) {
 		
 		ArrayList<VehicleCrash> topTen = new ArrayList<VehicleCrash>();
@@ -57,6 +80,12 @@ public static ArrayList<VehicleCrash> getTopTen(ArrayList<VehicleCrash> crashDat
 		return topTen;
 	}
 	
+	/**
+	 * Gets the bottom ten objects of a category
+	 * @param crashData Data set to use
+	 * @param dataName Category to get values from
+	 * @return Returns an ArrayList of object VehicleCrash
+	 */
 	public static ArrayList<VehicleCrash> getBottomTen(ArrayList<VehicleCrash> crashData, String dataName) {
 		
 		ArrayList<VehicleCrash> bottomTen = new ArrayList<VehicleCrash>();
@@ -78,6 +107,12 @@ public static ArrayList<VehicleCrash> getTopTen(ArrayList<VehicleCrash> crashDat
 		return bottomTen;
 	}
 	
+	/**
+	 * Gets the top ten objects of a category where the category is a String
+	 * @param crashData Data set to use
+	 * @param dataName Category to get values from
+	 * @return Returns an ArrayList of object VehicleCrash
+	 */
 	public static String getTopTenString(ArrayList<VehicleCrash> crashData, String dataName) {
 		
 		String topTenString = "";
@@ -112,6 +147,12 @@ public static ArrayList<VehicleCrash> getTopTen(ArrayList<VehicleCrash> crashDat
 		return topTenString;
 	}
 	
+	/**
+	 * Gets the bottom ten objects of a category where the category is a String
+	 * @param crashData Data set to use
+	 * @param dataName Category to get values from
+	 * @return Returns an ArrayList of object VehicleCrash
+	 */
 	public static String getBottomTenString(ArrayList<VehicleCrash> crashData, String dataName) {
 		
 		String bottomTenString = "";
@@ -146,6 +187,12 @@ public static ArrayList<VehicleCrash> getTopTen(ArrayList<VehicleCrash> crashDat
 		return bottomTenString;
 	}
 	
+	/**
+	 * Calculates a total of the specified category
+	 * @param crashData Data set to use
+	 * @param dataName Category to calculate the total for
+	 * @return Returns a long representing the total value
+	 */
 	public static long getTotal(ArrayList<VehicleCrash> crashData, String dataName) {
 		
 		long total = 0;
@@ -159,6 +206,12 @@ public static ArrayList<VehicleCrash> getTopTen(ArrayList<VehicleCrash> crashDat
 		return total;
 	}
 	
+	/**
+	 * Calculates the mean of the data
+	 * @param crashData Data set to use
+	 * @param dataName Category to calculate the mean for
+	 * @return Returns a integer representing the mean value
+	 */
 	public static double getMean(ArrayList<VehicleCrash> crashData, String dataName) {
 		
 		double total = 0;
@@ -174,6 +227,12 @@ public static ArrayList<VehicleCrash> getTopTen(ArrayList<VehicleCrash> crashDat
 		return mean;
 	}
 	
+	/**
+	 * Calculates the median of the data
+ 	 * @param crashData Data set to use
+	 * @param dataName Category to calculate the median for
+	 * @return Returns a double representing the median value
+	 */
 	public static double getMedian(ArrayList<VehicleCrash> crashData, String dataName) {
 		
 		double median = 0;
@@ -189,12 +248,18 @@ public static ArrayList<VehicleCrash> getTopTen(ArrayList<VehicleCrash> crashDat
 		}
 		else {
 			
-			median = (double)getValue(crashData.get(index - 1), dataName);
+			median = (double)getValue(crashData.get(index), dataName);
 		}
 		
 		return median;
 	}
 	
+	/**
+	 * Calculates the mode of the data
+	 * @param crashData Data set to use
+	 * @param dataName Category to calculate the mode for
+	 * @return Returns a integer representing the mode value
+	 */
 	public static int getMode(ArrayList<VehicleCrash> crashData, String dataName) {
 		
 		int[] bucket = getBucket(crashData, dataName);
@@ -213,6 +278,12 @@ public static ArrayList<VehicleCrash> getTopTen(ArrayList<VehicleCrash> crashDat
 		return maxIndex;
 	}
 	
+	/**
+	 * Calculates the mode of the data where the category data type is String
+	 * @param crashData Data set to use
+	 * @param dataName Category to calculate the mode for
+	 * @return Returns a integer representing the mode value
+	 */
 	public static int getModeString(ArrayList<VehicleCrash> crashData, String dataName) {
 		
 		int[] bucket = getBucketString(crashData, dataName);
@@ -231,6 +302,12 @@ public static ArrayList<VehicleCrash> getTopTen(ArrayList<VehicleCrash> crashDat
 		return maxIndex;
 	}
 	
+	/**
+	 * Gets a frequency bucket for the specified category
+	 * @param crashData Data set to use
+	 * @param dataName Category to get frequency bucket for
+	 * @return Returns an array of integers representing the frequency of the values
+	 */
 	public static int[] getBucket(ArrayList<VehicleCrash> crashData, String dataName) {
 		
 		int bucketSize = getMax(crashData, dataName);
@@ -254,6 +331,12 @@ public static ArrayList<VehicleCrash> getTopTen(ArrayList<VehicleCrash> crashDat
 		return bucket;
 	}
 
+	/**
+	 * Gets a frequency bucket for the specified category where the category is of type String
+	 * @param crashData Data set to use
+	 * @param dataName Category to get frequency bucket for
+	 * @return Returns an array of integers representing the frequency of the values
+	 */
 	public static int[] getBucketString(ArrayList<VehicleCrash> crashData, String dataName) {
 		
 		String[] valuesArray = getDataValuesString(crashData, dataName);
@@ -291,6 +374,12 @@ public static ArrayList<VehicleCrash> getTopTen(ArrayList<VehicleCrash> crashDat
 		return bucket;
 	}
 	
+	/**
+	 * Gets the different possible String values for the specified category
+	 * @param crashData Data set to use
+	 * @param dataName Category to get String values for
+	 * @return Returns an array of Strings that are the possible values for the category
+	 */
 	public static String[] getDataValuesString(ArrayList<VehicleCrash> crashData, String dataName) {
 		
 		TreeSet<String> values = new TreeSet<String>();
@@ -321,6 +410,12 @@ public static ArrayList<VehicleCrash> getTopTen(ArrayList<VehicleCrash> crashDat
 		return valuesArray;
 	}
 
+	/**
+	 * Gets the frequency bucket for the crash distance category
+	 * @param crashData Data set to calculate with
+	 * @param dataName "Crash Data"
+	 * @return Returns an array of integers representing the frequency bucket
+	 */
 	public static int[] getBucketCrashDistance(ArrayList<VehicleCrash> crashData, String dataName) {
 		
 		int bucketSize = getMax(crashData, dataName);
@@ -335,6 +430,12 @@ public static ArrayList<VehicleCrash> getTopTen(ArrayList<VehicleCrash> crashDat
 		return bucket;
 	}
 	
+	/**
+	 * Calculates the standard deviation of a specific data category
+	 * @param crashData Data to use for the calculation
+	 * @param dataName Category to find standard deviation for
+	 * @return Returns a double representing the standard deviation
+	 */
 	public static double getStandardDeviation(ArrayList<VehicleCrash> crashData, String dataName) {
 		
 		double total = 0;
@@ -360,6 +461,14 @@ public static ArrayList<VehicleCrash> getTopTen(ArrayList<VehicleCrash> crashDat
 		return standardDeviation;
 	}
 	
+	/**
+	 * Gets a level of standard deviation from the mean
+	 * @param level Level number
+	 * @param standardDeviation Standard deviation
+	 * @param mean Mean
+	 * @param isRounded Value returned should be rounded
+	 * @return Returns a rounded or not rounded string range of that level's standard deviation
+	 */
 	public static String getStandardDeviationLevel(int level, double standardDeviation, double mean, boolean isRounded) {
 		
 		double lower = 0;
@@ -379,7 +488,13 @@ public static ArrayList<VehicleCrash> getTopTen(ArrayList<VehicleCrash> crashDat
 		return ((Double)lower).toString() + " - " + ((Double)upper).toString();
 	}
 	
-	private static int getValue(VehicleCrash crash, String dataName) {
+	/**
+	 * Gets a specific category value where the data type is integer
+	 * @param crash Data object to get value from
+	 * @param dataName Category to get the value of
+	 * @return Returns the category data value as an integer
+	 */
+	public static int getValue(VehicleCrash crash, String dataName) {
 		int[] injuries = crash.getInjuries();
 		int[] speedLimits = crash.getSpeedLimits();
 		int[] crashObjects = crash.getCrashObjectsHit();
@@ -424,7 +539,13 @@ public static ArrayList<VehicleCrash> getTopTen(ArrayList<VehicleCrash> crashDat
 		return value;
 	}
 	
-	private static String getValueString(VehicleCrash crash, String dataName) {
+	/**
+	 * Gets a specific category value where the data type is String
+	 * @param crash Data object to get value from
+	 * @param dataName Category to get the value of
+	 * @return Returns the category data value as an String
+	 */
+	public static String getValueString(VehicleCrash crash, String dataName) {
 		
 		String categoryString = dataName.toUpperCase().replace(" ", "_");
 		ColumnData category = ColumnData.valueOf(categoryString);
@@ -489,9 +610,14 @@ public static ArrayList<VehicleCrash> getTopTen(ArrayList<VehicleCrash> crashDat
 		return value;
 	}
 	
+	/**
+	 * Rounds the input value to specified decimal places
+	 * @param value Value to round
+	 * @param places Decimal places to round to 
+	 * @return Return rounded double value
+	 */
 	public static double round(double value, int places) {
-	    if (places < 0) throw new IllegalArgumentException();
-
+	   
 	    long factor = (long) Math.pow(10, places);
 	    value = value * factor;
 	    long tmp = Math.round(value);

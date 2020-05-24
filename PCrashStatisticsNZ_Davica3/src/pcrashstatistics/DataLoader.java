@@ -5,8 +5,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * A class to load in data from a CSV file line by line into VehicleCrash objects
+ * @author Clayton Davidson
+ *
+ */
 public class DataLoader {
 	
+	/**
+	 * Loads data in from CSV
+	 * @param crashData Data structure to hold incoming data
+	 * @throws Exception IO Exception if the file is not found
+	 */
 	public static void Load(ArrayList<VehicleCrash> crashData) throws Exception {
 		String line;
 		
@@ -15,6 +25,7 @@ public class DataLoader {
 			Scanner scannerReader = new Scanner(new File("finaldata_201809.csv"));
 			int rowID = 0;
 			
+			//Loops through the file line by line
 			while (scannerReader.hasNextLine()) {
 				
 				line = scannerReader.nextLine();
@@ -42,17 +53,21 @@ public class DataLoader {
 				if (!fields[7].equals(fields[6])) location += ", " + fields[7];
 				if (!fields[8].equals(fields[7])) location += ", " + fields[8];
 				
+				//Adds object to array using line contents
 				crashData.add(new VehicleCrash(rowID, Integer.parseInt(fields[0]), fields[1], injuries, fields[5], location, isIntersection, fields[10], isFromSideRoad, Integer.parseInt(fields[12]), 
 						onStateHighway, fields[14], fields[15], fields[16], fields[17], fields[18], roadIsWet, fields[20], speedLimits, 
 						fields[24], fields[25], fields[26], crashObjectsHit));
 				
+				//Increases Row ID
 				rowID++;
 			}
 			
+			//Closes file
 			scannerReader.close();
 			
 		} catch(IOException e) {
 			
+			//File not found
 			System.out.println("IO Exception has occured");
 		}
 	}

@@ -2,19 +2,38 @@ package pcrashstatistics;
 
 import java.util.Comparator;
 
+/**
+ * A class to sort data based on set parameters
+ * @author Clayton Davidson
+ *
+ */
 public class DataSorter implements Comparator<VehicleCrash> {
 
+	/**
+	 * Sort parameters
+	 */
 	private static boolean isAscending;
 	private static ColumnData columnData;
 	
+	/**
+	 * Changes data sort direction (ascending or descending)
+	 * @param isAscending Direction value
+	 */
 	public static void setIsAscending(boolean isAscending) {
 		DataSorter.isAscending = isAscending;
 	}
 	
+	/**
+	 * Sets the data type to sort by
+	 * @param index Column to use for sort
+	 */
 	public static void setColumnNumber(ColumnData index) {
 		DataSorter.columnData = index;
 	}
 	
+	/**
+	 * Sort method compares the two objects values and returns the comparison value
+	 */
 	@Override
 	public int compare(VehicleCrash v1, VehicleCrash v2) {
 		
@@ -110,6 +129,7 @@ public class DataSorter implements Comparator<VehicleCrash> {
 			break;
 		}
 		
+		//If descending invert compare value
 		if (!isAscending && compareValue != 0) {
 			
 			compareValue *= -1;

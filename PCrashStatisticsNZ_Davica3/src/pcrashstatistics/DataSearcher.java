@@ -2,18 +2,32 @@ package pcrashstatistics;
 
 import java.util.ArrayList;
 
+/**
+ * A class to apply a list of search filters to a data set and return results
+ * @author Clayton Davidson
+ *
+ */
 public class DataSearcher {
 
+	/**
+	 * Uses a list of search filters to refine a data set to specific results
+	 * @param crashData Data set to search through
+	 * @param filters Search filter strings to be applied
+	 * @return ArrayList of type VehicleCrash which meet the search requirements
+	 */
 	public static ArrayList<VehicleCrash> searchWithFilters(ArrayList<VehicleCrash> crashData, ArrayList<String> filters) {
 		
 		ArrayList<VehicleCrash> searchResults = new ArrayList<VehicleCrash>();
 		
+		//Loop through all data
 		for (int d = 0; d < crashData.size(); d++) {
 
 			boolean meetsCriteria = true;
 			
+			//Loop through filters
 			for (int f = 0; f < filters.size(); f++) {
 				
+				//Break down filter into category, compare type, and user argument
 				String[] filterValues = filters.get(f).split(",");
 				String category = filterValues[0].toUpperCase().replace(" ", "_");
 				String compareType = filterValues[1];
@@ -21,10 +35,12 @@ public class DataSearcher {
 				
 				ColumnData dataIndex = ColumnData.valueOf(category);
 
+				//Apply the filter to the data - check it meets requirements
 				meetsCriteria = applyFilter(crashData.get(d), dataIndex, compareType, argument);
-				if (!meetsCriteria) break;
+				if (!meetsCriteria) break; //If does not meet requirements stop checking
 			}
 			
+			//If data meets criteria add to results list
 			if (meetsCriteria) {
 				
 				searchResults.add(crashData.get(d));
@@ -34,6 +50,14 @@ public class DataSearcher {
 		return searchResults;
 	}
 	
+	/**
+	 * Applies a filter to the data, checking that the data meets the constraints
+	 * @param crash Specific object to check meets requirements
+	 * @param dataIndex Category of data to check against
+	 * @param compareType Comparison type
+	 * @param argument User defined search argument to compare to
+	 * @return Returns a boolean result to show if the data meets search filters
+	 */
 	private static boolean applyFilter(VehicleCrash crash, ColumnData dataIndex, String compareType, String argument) {
 		
 		boolean result = false;
@@ -42,6 +66,7 @@ public class DataSearcher {
 		int[] speedLimits = crash.getSpeedLimits();
 		int[] crashObjects = crash.getCrashObjectsHit();
 		
+		//Compare user argument to object data
 		try
 		{
 			switch (dataIndex) {
@@ -150,9 +175,17 @@ public class DataSearcher {
 		return result;
 	}
 	
+	/**
+	 * Compares a user defined value to an object value where both are integers
+	 * @param crashValue Crash object value
+	 * @param comparison Comparison type
+	 * @param filterValue User selected value
+	 * @return Boolean stating if the object value meets the filter requirement
+	 */
 	private static boolean compareValues(int crashValue, String comparison, int filterValue) {
 		boolean result = false;
 		
+		//Switch based on comparison type
 		switch (comparison) {
 		case "==":
 			result = (crashValue == filterValue);
@@ -174,13 +207,22 @@ public class DataSearcher {
 		return result;
 	}
 	
+	/**
+	 * Compares a user defined value to an object value where both are Strings
+	 * @param crashValue Crash object value
+	 * @param comparison Comparison type
+	 * @param filterValue User selected value
+	 * @return Boolean stating if the object value meets the filter requirement
+	 */
 	private static boolean compareValues(String crashValue, String comparison, String filterValue) {
 		boolean result = false;
 		
+		//If comparison is exact match
 		if (comparison.equals("==")) {
 			
 			result = crashValue.equals(filterValue);
 		}
+		//Comparison is partial match
 		else {
 			
 			result = crashValue.contains(filterValue);
